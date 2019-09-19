@@ -1,0 +1,18 @@
+<html xmlns:th="http://java.sun.com/JSP/Page" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <title>First Web Application</title>
+</head>
+<body>
+<div sec:authorize="isAuthenticated()">
+    This content is only shown to authenticated users.
+    Logged user: <span sec:authentication="name">Bob</span>
+    Roles: <span sec:authentication="principal.authorities">[ROLE_USER, ROLE_ADMIN]</span>
+</div>
+<div sec:authorize="hasRole('ROLE_ADMIN')">
+    This content is only shown to administrators.
+</div>
+<div sec:authorize="hasRole('ROLE_USER')">
+    This content is only shown to users.
+</div>
+</body>
+</html>
