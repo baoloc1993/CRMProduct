@@ -26,7 +26,7 @@ function App() {
                     <Route path='/home' component={Home}/>
                     <Route path='/ship' component={Checkout}/>
                     <Route path='/order' component={LatestOrders}/>
-                    <Route path='/shipDetail' component={OrderDetail}/>
+                    <Route path='/orderDetail' component={OrderDetail}/>
                 </Switch>
             </Router>
         </ThemeProvider>

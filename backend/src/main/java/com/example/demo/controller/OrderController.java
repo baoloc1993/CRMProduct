@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.jwt.JwtTokenProvider;
 import com.example.demo.model.OrderRecord;
 import com.example.demo.model.User;
 import com.example.demo.repository.OrderRepository;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -35,12 +37,22 @@ public class OrderController {
     @Autowired
     UserRepository userRepository;
 
-    @RequestMapping(value = "/create" ,method = RequestMethod.POST)
-    public ResponseEntity createOrder(Model model, @RequestBody OrderRequest orderRequest){
-        try{
-            OrderRecord orderRecord =  new OrderRecord();
-            LocalDateTime registerDateTime =  LocalDateTime.now();
-            User user = userRepository.findById(orderRequest.getUserId()).get();
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
+
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    public ResponseEntity createOrder(Model model, @RequestBody OrderRequest orderRequest,
+                                      @RequestHeader("Authorization") String authorization) {
+        try {
+            if (StringUtils.isEmpty(orderRequest.getOrderLink())
+                    || StringUtils.isEmpty(orderRequest.getAddress())
+                    || orderRequest.getUsdPrice() <= 0) {
+                return badRequest().build();
+            }
+            String userName = jwtTokenProvider.getUsername(authorization.substring(7));
+            OrderRecord orderRecord = new OrderRecord();
+            LocalDateTime registerDateTime = LocalDateTime.now();
+            User user = userRepository.findUserByUsername(userName);
             orderRecord.setAddress(orderRequest.getAddress());
             orderRecord.setCustomer(user);
             orderRecord.setNote(orderRequest.getNote());
@@ -54,18 +66,19 @@ public class OrderController {
             orderRecord.setTotalValueVnd(orderRequest.getTotalValueVnd());
             orderRecord.setStatus("NEW");
             orderRepository.save(orderRecord);
-            return ok(model);
-        }catch (Exception e) {
+            return ok().build();
+        } catch (Exception e) {
             logger.error(e.getMessage());
+            e.printStackTrace();
             return badRequest().build();
         }
     }
 
-    @RequestMapping(value = "/assign" ,method = RequestMethod.POST)
-    public ResponseEntity assignOrder(Model model, @RequestBody AssignOrderRequest assignOrderRequest){
-        try{
+    @RequestMapping(value = "/assign", method = RequestMethod.POST)
+    public ResponseEntity assignOrder(Model model, @RequestBody AssignOrderRequest assignOrderRequest) {
+        try {
             OrderRecord orderRecord = orderRepository.findById(assignOrderRequest.getOrderId()).get();
-            LocalDateTime assignDateTime =  LocalDateTime.now();
+            LocalDateTime assignDateTime = LocalDateTime.now();
             User staff = userRepository.findById(assignOrderRequest.getStaffId()).get();
             User manager = userRepository.findById(assignOrderRequest.getManagerId()).get();
             orderRecord.setId(assignOrderRequest.getOrderId());
@@ -75,61 +88,66 @@ public class OrderController {
             orderRecord.setStatus("IN PROGRESS");
             orderRepository.save(orderRecord);
             return ok(model);
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.error(e.getMessage());
             return badRequest().build();
         }
     }
 
-    @RequestMapping(value = "/complete" ,method = RequestMethod.POST)
-    public ResponseEntity completeOrder(Model model, @RequestBody CompleteOrderRequest completeOrderRequest){
-        try{
+    @RequestMapping(value = "/complete", method = RequestMethod.POST)
+    public ResponseEntity completeOrder(Model model, @RequestBody CompleteOrderRequest completeOrderRequest) {
+        try {
             OrderRecord orderRecord = orderRepository.findById(completeOrderRequest.getOrderId()).get();
             User staff = userRepository.findById(completeOrderRequest.getStaffId()).get();
             orderRecord.setId(completeOrderRequest.getOrderId());
-            orderRecord.setCompletedDateTime( LocalDateTime.now());
+            orderRecord.setCompletedDateTime(LocalDateTime.now());
             orderRecord.setPersonInCharge(staff);
             orderRecord.setStatus("COMPLETED");
             orderRepository.save(orderRecord);
             return ok(model);
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.error(e.getMessage());
             return badRequest().build();
         }
     }
 
 
-    @RequestMapping(value = "/get" ,method = RequestMethod.GET)
-    public ResponseEntity getOrder(Model model, @RequestParam int orderId){
-        try{
-            OrderRecord orderRecord = orderRepository.findById(orderId).get();
-            model.addAttribute("order",orderRecord);
+    @RequestMapping(value = "/get", method = RequestMethod.GET)
+    public ResponseEntity getOrder(Model model, @RequestParam int orderId,
+                                   @RequestHeader("Authorization") String authorization) {
+        try {
+            String userName = jwtTokenProvider.getUsername(authorization.substring(7));
+            User user = userRepository.findUserByUsername(userName);
+            OrderRecord orderRecord = orderRepository.findById(orderId,user.getId()).get();
+
+            model.addAttribute("order", orderRecord);
+            model.addAttribute("role",user.getRole().getName());
             return ok(model);
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.error(e.getMessage());
             return badRequest().build();
         }
     }
 
-    @RequestMapping(value = "/getListByPIC" ,method = RequestMethod.GET)
-    public ResponseEntity getListOrderByPIC(Model model, @RequestParam int picId){
-        try{
+    @RequestMapping(value = "/getListByPIC", method = RequestMethod.GET)
+    public ResponseEntity getListOrderByPIC(Model model, @RequestParam int picId) {
+        try {
             List<Optional<OrderRecord>> listOrder = orderRepository.findListOrderByPIC(picId);
-            model.addAttribute("order",listOrder.stream().map(Optional::get).collect(Collectors.toList()));
+            model.addAttribute("order", listOrder.stream().map(Optional::get).collect(Collectors.toList()));
             return ok(model);
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.error(e.getMessage());
             return badRequest().build();
         }
     }
 
-    @RequestMapping(value = "/getListByManager" ,method = RequestMethod.GET)
-    public ResponseEntity getListOrderByManager(Model model, @RequestParam int managerId){
-        try{
+    @RequestMapping(value = "/getListByManager", method = RequestMethod.GET)
+    public ResponseEntity getListOrderByManager(Model model, @RequestParam int managerId) {
+        try {
             List<Optional<OrderRecord>> listOrder = orderRepository.findListOrderByManager(managerId);
-            model.addAttribute("order",listOrder.stream().map(Optional::get).collect(Collectors.toList()));
+            model.addAttribute("order", listOrder.stream().map(Optional::get).collect(Collectors.toList()));
             return ok(model);
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.error(e.getMessage());
             return badRequest().build();
         }
