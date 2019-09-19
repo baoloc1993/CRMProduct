@@ -1,12 +1,68 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
+import Button from "@material-ui/core/Button";
+import {makeStyles} from "@material-ui/core";
+import axios from "axios";
+const useStyles = makeStyles(theme => ({
+  appBar: {
+    position: 'relative',
+  },
+  layout: {
+    width: 'auto',
+    marginLeft: theme.spacing(2),
+    marginRight: theme.spacing(2),
+    [theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
+      width: 600,
+      marginLeft: 'auto',
+      marginRight: 'auto',
+    },
+  },
+  buttons: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+  },
+  button: {
+    marginTop: theme.spacing(3),
+    marginLeft: theme.spacing(1),
+  },
+}));
+
+
 
 export default function ShipForm(role) {
+  const classes = useStyles();
+  const [form, setForm] = React.useState({
+    orderLink: "",
+    trackingLink: "",
+    address: "",
+    usdPrice: 0.00,
+    tax: 0.00,
+    totalValueUSD: 0.00,
+    rate : 0.00,
+    totalValueVND: 0,
+    note : "",
+    status : ""
+  });
+
+  function handleSubmit() {
+    axios.post("http://localhost:8080/order/submit", {
+      form
+    })
+      .then(res => {
+        this.data = res.data;
+        this.setState({
+
+        });
+      });
+  }
   role = "ADMIN";
+
+  function handleInputChange(event) {
+    const {name,value} = event.target;
+    setForm({...form, [name]: value})
+  }
+
   return (
     <React.Fragment>
       <Grid container spacing={3}>
@@ -18,6 +74,7 @@ export default function ShipForm(role) {
             label="Link Đặt Hàng"
             fullWidth
             autoComplete="order"
+            onChange={(event)=>handleInputChange(event)}
           />
         </Grid>
         <Grid item xs={12} sm={12} style = {{display: checkRole(role,["STAFF","MANAGER","ADMIN"])}} >
@@ -28,6 +85,7 @@ export default function ShipForm(role) {
             label="Link Tracking"
             fullWidth
             autoComplete="tracking"
+            onChange={(event)=>handleInputChange(event)}
           />
         </Grid>
         <Grid item xs={12}  style = {{display: checkRole(role,["CUSTOMER","MANAGER","ADMIN"])}}>
@@ -37,6 +95,8 @@ export default function ShipForm(role) {
             label="Địa chỉ"
             fullWidth
             autoComplete="address"
+            onChange={(event)=>handleInputChange(event)}
+
           />
         </Grid>
         <Grid item xs={12} >
@@ -47,6 +107,7 @@ export default function ShipForm(role) {
             label="Giá Sản phẩm (USD)"
             fullWidth
             autoComplete="usdPrice"
+            onChange={(event)=>handleInputChange(event)}
 
           />
         </Grid>
@@ -57,6 +118,7 @@ export default function ShipForm(role) {
             label="Tax"
             fullWidth
             autoComplete="tax"
+            onChange={(event)=>handleInputChange(event)}
           />
         </Grid>
         <Grid item xs={12} style = {{display: checkRole(role,["MANAGER","ADMIN"])}}>
@@ -67,6 +129,7 @@ export default function ShipForm(role) {
             fullWidth
             autoComplete="totalValueUSD"
             disabled
+            onChange={(event)=>handleInputChange(event)}
           />
         </Grid>
         <Grid item xs={12} style = {{display: checkRole(role,["MANAGER","ADMIN"])}}>
@@ -76,6 +139,7 @@ export default function ShipForm(role) {
             label="Tỉ giá"
             fullWidth
             autoComplete="rate"
+            onChange={(event)=>handleInputChange(event)}
           />
         </Grid>
         <Grid item xs={12} style = {{display: checkRole(role,["MANAGER","ADMIN"])}}>
@@ -86,6 +150,7 @@ export default function ShipForm(role) {
             fullWidth
             autoComplete="totalValueVND"
             disabled
+            onChange={(event)=>handleInputChange(event)}
           />
         </Grid>
         <Grid item xs={12} sm={12} style = {{display: checkRole(role,["MANAGER","ADMIN"])}}>
@@ -96,6 +161,7 @@ export default function ShipForm(role) {
             fullWidth
             autoComplete="note"
             multiline
+            onChange={(event)=>handleInputChange(event)}
           />
         </Grid>
         <Grid item xs={12} style = {{display: checkRole(role,["MANAGER","ADMIN"])}}>
@@ -106,9 +172,19 @@ export default function ShipForm(role) {
             fullWidth
             autoComplete="status"
             disabled
+            onChange={(event)=>handleInputChange(event)}
           />
         </Grid>
-
+        <div className={classes.buttons}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            className={classes.button}
+          >
+            Xác nhận
+          </Button>
+        </div>
       </Grid>
     </React.Fragment>
   );
