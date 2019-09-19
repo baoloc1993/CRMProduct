@@ -10,6 +10,8 @@ import Home from "./component/Home";
 import SignIn from "./component/Login";
 import { createBrowserHistory } from "history";
 import theme from './theme';
+import ShipForm from "./component/ship/ShipForm";
+import OrderDetail from "./component/order/OrderDetail";
 
 
 
@@ -24,6 +26,7 @@ function App() {
                     <Route path='/home' component={Home}/>
                     <Route path='/ship' component={Checkout}/>
                     <Route path='/order' component={LatestOrders}/>
+                    <Route path='/shipDetail' component={OrderDetail}/>
                 </Switch>
             </Router>
         </ThemeProvider>

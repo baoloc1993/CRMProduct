@@ -30,8 +30,9 @@ const useStyles = makeStyles(theme => ({
 
 
 
-export default function ShipForm(role) {
-  const classes = useStyles();
+export default function ShipForm(props) {
+  let role = props.role;
+  let disable = props.disable;
   const [form, setForm] = React.useState({
     orderLink: "",
     trackingLink: "",
@@ -44,6 +45,8 @@ export default function ShipForm(role) {
     note : "",
     status : ""
   });
+  const classes = useStyles();
+
 
   function handleSubmit() {
     axios.post("http://localhost:8080/order/submit", {
@@ -56,7 +59,6 @@ export default function ShipForm(role) {
         });
       });
   }
-  role = "ADMIN";
 
   function handleInputChange(event) {
     const {name,value} = event.target;
@@ -75,6 +77,7 @@ export default function ShipForm(role) {
             fullWidth
             autoComplete="order"
             onChange={(event)=>handleInputChange(event)}
+            disabled={disable}
           />
         </Grid>
         <Grid item xs={12} sm={12} style = {{display: checkRole(role,["STAFF","MANAGER","ADMIN"])}} >
@@ -86,6 +89,7 @@ export default function ShipForm(role) {
             fullWidth
             autoComplete="tracking"
             onChange={(event)=>handleInputChange(event)}
+            disabled={disable}
           />
         </Grid>
         <Grid item xs={12}  style = {{display: checkRole(role,["CUSTOMER","MANAGER","ADMIN"])}}>
@@ -96,7 +100,7 @@ export default function ShipForm(role) {
             fullWidth
             autoComplete="address"
             onChange={(event)=>handleInputChange(event)}
-
+            disabled={disable}
           />
         </Grid>
         <Grid item xs={12} >
@@ -108,7 +112,7 @@ export default function ShipForm(role) {
             fullWidth
             autoComplete="usdPrice"
             onChange={(event)=>handleInputChange(event)}
-
+            disabled={disable}
           />
         </Grid>
         <Grid item xs={12} style = {{display: checkRole(role,["STAFF","MANAGER","ADMIN"])}}>
@@ -119,6 +123,7 @@ export default function ShipForm(role) {
             fullWidth
             autoComplete="tax"
             onChange={(event)=>handleInputChange(event)}
+            disabled={disable}
           />
         </Grid>
         <Grid item xs={12} style = {{display: checkRole(role,["MANAGER","ADMIN"])}}>
@@ -130,6 +135,7 @@ export default function ShipForm(role) {
             autoComplete="totalValueUSD"
             disabled
             onChange={(event)=>handleInputChange(event)}
+
           />
         </Grid>
         <Grid item xs={12} style = {{display: checkRole(role,["MANAGER","ADMIN"])}}>
@@ -140,6 +146,7 @@ export default function ShipForm(role) {
             fullWidth
             autoComplete="rate"
             onChange={(event)=>handleInputChange(event)}
+            disabled={disable}
           />
         </Grid>
         <Grid item xs={12} style = {{display: checkRole(role,["MANAGER","ADMIN"])}}>
@@ -162,6 +169,7 @@ export default function ShipForm(role) {
             autoComplete="note"
             multiline
             onChange={(event)=>handleInputChange(event)}
+            disabled={disable}
           />
         </Grid>
         <Grid item xs={12} style = {{display: checkRole(role,["MANAGER","ADMIN"])}}>
@@ -175,12 +183,13 @@ export default function ShipForm(role) {
             onChange={(event)=>handleInputChange(event)}
           />
         </Grid>
-        <div className={classes.buttons}>
+        <div className={classes.buttons} style = {{display : disable ? 'none' : 'block' }}>
           <Button
             variant="contained"
             color="primary"
             onClick={handleSubmit}
             className={classes.button}
+            disabled={disable}
           >
             Xác nhận
           </Button>

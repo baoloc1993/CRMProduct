@@ -76,7 +76,7 @@ function Home(props) {
     authentication("auth/home", onChange);
     if (auth === undefined){
       return blank();
-    }else if (auth) {
+    }else if (!auth) {
         return generatePage()
     } else {
         return fail()
