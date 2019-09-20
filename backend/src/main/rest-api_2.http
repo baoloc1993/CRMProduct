@@ -1,0 +1,10 @@
+POST http://localhost:8080/order/assign
+Accept: */*
+Cache-Control: no-cache
+
+
+<> 2019-09-19T111343.403.json
+<> 2019-09-19T111228.403.json
+
+###
+

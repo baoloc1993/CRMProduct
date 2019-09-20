@@ -73,13 +73,6 @@ export default function Checkout(props) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
 
-  const handleNext = () => {
-    setActiveStep(activeStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep(activeStep - 1);
-  };
   const [userRole, setRole] = React.useState(undefined);
   getRole((a)=>onChange(a));
   if (userRole === undefined){
@@ -135,7 +128,7 @@ export default function Checkout(props) {
                 </React.Fragment>
               ) : (
                 <React.Fragment>
-                  <ShipForm role = {userRole} disable = {disable}/>
+                  <ShipForm role = {userRole} disable = {disable} data = {undefined}/>
                 </React.Fragment>
               )}
             </React.Fragment>
