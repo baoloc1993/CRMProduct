@@ -26,8 +26,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.Constant;
 import com.example.demo.jwt.JwtTokenProvider;
 import com.example.demo.model.OrderRecord;
+import com.example.demo.model.OrderStatus;
 import com.example.demo.model.User;
 import com.example.demo.repository.OrderRepository;
+import com.example.demo.repository.StatusRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.request.AssignOrderRequest;
 import com.example.demo.request.CompleteOrderRequest;
@@ -47,6 +49,9 @@ public class OrderController {
 
   @Autowired
   JwtTokenProvider jwtTokenProvider;
+
+  @Autowired
+  StatusRepository statusRepository;
 
   @RequestMapping(value = "/create", method = RequestMethod.POST)
   public ResponseEntity createOrder(Model model, @RequestBody OrderRequest orderRequest,
@@ -72,7 +77,8 @@ public class OrderController {
       orderRecord.setRate(orderRequest.getRate());
       orderRecord.setTotalValueUsd(orderRequest.getTotalValueUsd());
       orderRecord.setTotalValueVnd(orderRequest.getTotalValueVnd());
-      orderRecord.setStatus("NEW");
+      OrderStatus orderStatus =  statusRepository.findById(Constant.NEW).get();
+      orderRecord.setStatus(orderStatus);
       orderRepository.save(orderRecord);
       return ok().build();
     } catch (Exception e) {
@@ -97,7 +103,8 @@ public class OrderController {
       orderRecord.setAssignDateTime(assignDateTime);
       orderRecord.setManagerInCharge(manager);
       orderRecord.setPersonInCharge(staff);
-      orderRecord.setStatus("IN PROGRESS");
+      OrderStatus orderStatus =  statusRepository.findById(Constant.ASSIGNED).get();
+      orderRecord.setStatus(orderStatus);
       orderRepository.save(orderRecord);
       return ok(model);
     } catch (Exception e) {
@@ -109,12 +116,28 @@ public class OrderController {
   @RequestMapping(value = "/complete", method = RequestMethod.POST)
   public ResponseEntity completeOrder(Model model, @RequestBody CompleteOrderRequest completeOrderRequest) {
     try {
-      OrderRecord orderRecord = orderRepository.findById(completeOrderRequest.getOrderId()).get();
-      User staff = userRepository.findById(completeOrderRequest.getStaffId()).get();
-      orderRecord.setId(completeOrderRequest.getOrderId());
+      int orderId = completeOrderRequest.getOrderId();
+      OrderRecord orderRecord = orderRepository.findById(orderId).get();
+      orderRecord.setId(orderId);
       orderRecord.setCompletedDateTime(LocalDateTime.now());
-      orderRecord.setPersonInCharge(staff);
-      orderRecord.setStatus("COMPLETED");
+      OrderStatus orderStatus =  statusRepository.findById(Constant.COMPLETE).get();
+      orderRecord.setStatus(orderStatus);
+      orderRepository.save(orderRecord);
+      return ok(model);
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+      return badRequest().build();
+    }
+  }
+
+  @RequestMapping(value = "/perform", method = RequestMethod.POST)
+  public ResponseEntity performOrder(Model model, @RequestBody CompleteOrderRequest completeOrderRequest) {
+    try {
+      int orderId = completeOrderRequest.getOrderId();
+      OrderRecord orderRecord = orderRepository.findById(orderId).get();
+      orderRecord.setPicDateTime(LocalDateTime.now());
+      OrderStatus orderStatus =  statusRepository.findById(Constant.IN_PROGRESS).get();
+      orderRecord.setStatus(orderStatus);
       orderRepository.save(orderRecord);
       return ok(model);
     } catch (Exception e) {
@@ -124,16 +147,16 @@ public class OrderController {
   }
 
   @RequestMapping(value = "/get", method = RequestMethod.GET)
-  public ResponseEntity getOrder(Model model, @RequestParam int orderId,
+  public ResponseEntity getOrder(Model model, @RequestParam String orderId,
       @RequestHeader("Authorization") String authorization) {
     try {
       String userName = jwtTokenProvider.getUsername(authorization.substring(7));
       User user = userRepository.findUserByUsername(userName);
       OrderRecord orderRecord;
-      if (user.getRole().getName().equals("ADMIN")){
-        orderRecord = orderRepository.findById(orderId).get();
-      }else{
-        orderRecord = orderRepository.findById(orderId, user.getId()).get();
+      if (user.getRole().getName().equals("ADMIN")) {
+        orderRecord = orderRepository.findById(Integer.parseInt(orderId)).get();
+      } else {
+        orderRecord = orderRepository.findById(Integer.parseInt(orderId), user.getId()).get();
       }
       model.addAttribute("order", orderRecord);
       model.addAttribute("role", user.getRole().getName());
@@ -174,16 +197,16 @@ public class OrderController {
       String userName = jwtTokenProvider.getUsername(authorization.substring(7));
       User user = userRepository.findUserByUsername(userName);
       List<User> staffs = new ArrayList<>();
-      userRepository.findAll().forEach(staff->{
-        if(staff.getRole().getName().equals(Constant.STAFF)){
+      userRepository.findAll().forEach(staff -> {
+        if (staff.getRole().getName().equals(Constant.STAFF)) {
           staffs.add(staff);
         }
       });
-      List<OrderRecord> listOrder =  new ArrayList<>();
-      if (user.getRole().getName().equals(Constant.ADMIN)){
+      List<OrderRecord> listOrder = new ArrayList<>();
+      if (user.getRole().getName().equals(Constant.ADMIN)) {
         List<OrderRecord> finalListOrder = listOrder;
-        orderRepository.findAll().forEach(order-> finalListOrder.add(order));
-      }else{
+        orderRepository.findAll().forEach(order -> finalListOrder.add(order));
+      } else {
         listOrder = orderRepository.findList(user.getId()).stream().map(Optional::get).collect(Collectors.toList());
       }
 

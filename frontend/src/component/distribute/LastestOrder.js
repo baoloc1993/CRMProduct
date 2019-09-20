@@ -108,9 +108,27 @@ const LatestOrders = props => {
     props.history.push('/orderDetail?orderId=' + orderId);
 
   }
+  function completeOrder(orderId) {
+    let token = Cookies.get('access_token');
+    token = ("Bearer " + token);
+
+    let URL = "http://localhost:8080/order/complete";
+    axios.defaults.headers.common['Authorization'] = token;
+    axios.post(URL, {
+      orderId :orderId,
+    }).then(r => {
+      if (r.status == 200) {
+        setData(r.data);
+      } else {
+        setData(undefined);
+      }
+    }).catch(e => {
+      setData(undefined);
+    });
+  }
   function assignStaff(event) {
     let value =  event.target.value;
-    console.log(value.split('-'));
+
     let orderId = value.split("-")[0];
     let staffId = value.split("-")[1];
     let token = Cookies.get('access_token');
@@ -121,6 +139,24 @@ const LatestOrders = props => {
     axios.post(URL, {
       orderId :orderId,
       staffId : staffId
+    }).then(r => {
+      if (r.status == 200) {
+        setData(r.data);
+      } else {
+        setData(undefined);
+      }
+    }).catch(e => {
+      setData(undefined);
+    });
+  }
+  function processOrder(orderId) {
+    let token = Cookies.get('access_token');
+    token = ("Bearer " + token);
+
+    let URL = "http://localhost:8080/order/perform";
+    axios.defaults.headers.common['Authorization'] = token;
+    axios.post(URL, {
+      orderId :orderId,
     }).then(r => {
       if (r.status == 200) {
         setData(r.data);
@@ -165,6 +201,8 @@ const LatestOrders = props => {
                     <TableCell>Status</TableCell>
                     <TableCell>Assign</TableCell>
                     <TableCell>View</TableCell>
+                    <TableCell>Process</TableCell>
+                    <TableCell>Complete</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -172,7 +210,6 @@ const LatestOrders = props => {
                     <TableRow
                       hover
                       key={order.id}
-                      style={{cursor:"pointer"}}
                     >
                       <TableCell>{order.id}</TableCell>
                       <TableCell>{order.orderLink}</TableCell>
@@ -181,7 +218,7 @@ const LatestOrders = props => {
                       </TableCell>
                       <TableCell>
                         <div className={classes.statusContainer}>
-                          {order.status}
+                          {order.status.name}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -198,6 +235,19 @@ const LatestOrders = props => {
                       <TableCell>
                         <Button color="primary"  size="small"variant="text" onClick={()=>viewOrderDetail(order.id)}>
                           View
+                        </Button>
+                      </TableCell>
+                      <TableCell>
+                        <Button color="primary"  size="small"variant="text" onClick={()=>processOrder(order.id)}
+                                disabled={order.status.id >=2}
+                        >
+                          Process Order
+                        </Button>
+                      </TableCell>
+                      <TableCell>
+                        <Button color="primary"  size="small"variant="text" onClick={()=>completeOrder(order.id)}
+                                disabled={order.status.id >=3}>
+                          Complete Order
                         </Button>
                       </TableCell>
                     </TableRow>
