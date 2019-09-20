@@ -16,4 +16,7 @@ public interface Constant {
   int ASSIGNED = 1;
   int IN_PROGRESS = 2;
   int COMPLETE =3;
+
+
+  int MAX_TOKEN_LENGTH = 100;
 }

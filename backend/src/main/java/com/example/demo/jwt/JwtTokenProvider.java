@@ -1,6 +1,9 @@
 package com.example.demo.jwt;
 
+import com.example.demo.Constant;
 import com.example.demo.model.Role;
+import com.example.demo.model.TokenStatus;
+import com.example.demo.repository.TokenRepository;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.Base64;
 import java.util.Date;
-import java.util.List;
 
 @Component
 public class JwtTokenProvider {
@@ -25,6 +27,9 @@ public class JwtTokenProvider {
     private long validityInMilliseconds = 3600000; // 1h
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private TokenRepository tokenRepository;
     @PostConstruct
     protected void init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
@@ -54,8 +59,19 @@ public class JwtTokenProvider {
     }
     public String resolveToken(HttpServletRequest req) {
         String bearerToken = req.getHeader("Authorization");
+
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7, bearerToken.length());
+            String tokenStr = bearerToken.substring(7);
+//            TokenStatus tokenStatus =  null;
+//            String subToken  =tokenStr.substring(0,Constant.MAX_TOKEN_LENGTH);
+//            try{
+//                tokenStatus = tokenRepository.findTokenByString(subToken).get();
+//            }catch (Exception e){
+//
+//            }
+//            if (tokenStatus == null ||tokenStatus.getPermit() == 0) return null;
+//            else return tokenStr;\
+            return  tokenStr;
         }
         return null;
     }

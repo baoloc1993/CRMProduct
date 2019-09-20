@@ -32,6 +32,7 @@ public class OrderRecord {
   float rate;
   float totalValueVnd;
   String note;
+  int number;
 
   @ManyToOne
   @JoinColumn(name = "order_status", referencedColumnName = "id")

@@ -53,6 +53,10 @@ public class OrderController {
   @Autowired
   StatusRepository statusRepository;
 
+  @RequestMapping(value = "/*",method = RequestMethod.OPTIONS)
+  public ResponseEntity handleOption(Model model){
+    return ok(model);
+  }
   @RequestMapping(value = "/update", method = RequestMethod.POST)
   public ResponseEntity updateOrder(Model model, @RequestBody OrderRequest orderRequest,
       @RequestHeader("Authorization") String authorization) {
@@ -74,10 +78,12 @@ public class OrderController {
       orderRecord.setOrderLink(orderRequest.getOrderLink());
       orderRecord.setRate(orderRequest.getRate());
       orderRecord.setAddress(orderRequest.getAddress());
+      orderRecord.setNumber(orderRequest.getNumber());
       orderRecord.setUsdPrice(orderRequest.getUsdPrice());
       orderRecord.setRate(orderRequest.getRate());
-      orderRecord.setTotalValueUsd(orderRequest.getTotalValueUsd());
-      orderRecord.setTotalValueVnd(orderRequest.getTotalValueVnd());
+      float totalValueUsd = orderRequest.getUsdPrice()*(1+orderRequest.getTax());
+      orderRecord.setTotalValueUsd(totalValueUsd);
+      orderRecord.setTotalValueVnd(totalValueUsd*(orderRequest.getRate()));
       OrderStatus orderStatus =  statusRepository.findById(Constant.NEW).get();
       orderRecord.setStatus(orderStatus);
       orderRepository.save(orderRecord);
@@ -108,10 +114,12 @@ public class OrderController {
       orderRecord.setOrderLink(orderRequest.getOrderLink());
       orderRecord.setRate(orderRequest.getRate());
       orderRecord.setAddress(orderRequest.getAddress());
+      orderRecord.setNumber(orderRequest.getNumber());
       orderRecord.setUsdPrice(orderRequest.getUsdPrice());
       orderRecord.setRate(orderRequest.getRate());
-      orderRecord.setTotalValueUsd(orderRequest.getTotalValueUsd());
-      orderRecord.setTotalValueVnd(orderRequest.getTotalValueVnd());
+      float totalValueUsd = orderRequest.getUsdPrice()*(1+orderRequest.getTax());
+      orderRecord.setTotalValueUsd(totalValueUsd);
+      orderRecord.setTotalValueVnd(totalValueUsd*(1  +orderRequest.getRate()));
       OrderStatus orderStatus =  statusRepository.findById(Constant.NEW).get();
       orderRecord.setStatus(orderStatus);
       orderRepository.save(orderRecord);
