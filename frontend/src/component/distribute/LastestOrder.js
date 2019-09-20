@@ -27,6 +27,8 @@ import StatusBullet from "./StatusBullet";
 import {authentication} from "../Authentication";
 import Cookies from "js-cookie";
 import axios from "axios";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
 
 
 const useStyles = makeStyles(theme => ({
@@ -61,7 +63,7 @@ const LatestOrders = props => {
 
   const classes = useStyles();
 
-  const [orders] = useState(mockData);
+
   // const [auth, setAuth] = React.useState(undefined);
 
   function getData(callback) {
@@ -72,13 +74,17 @@ const LatestOrders = props => {
     axios.defaults.headers.common['Authorization'] = token;
     axios.get(URL, {}).then(r => {
       if (r.status == 200) {
-        callback(r.data.order);
+        callback(r.data);
       } else {
         callback(undefined);
       }
     }).catch(e => {
       callback(undefined);
     });
+
+  };
+  function assignStaff(orderId, staffId, callback) {
+
 
   };
   const [data, setData] = React.useState(undefined);
@@ -102,7 +108,29 @@ const LatestOrders = props => {
     props.history.push('/orderDetail?orderId=' + orderId);
 
   }
+  function assignStaff(event) {
+    let value =  event.target.value;
+    console.log(value.split('-'));
+    let orderId = value.split("-")[0];
+    let staffId = value.split("-")[1];
+    let token = Cookies.get('access_token');
+    token = ("Bearer " + token);
 
+    let URL = "http://localhost:8080/order/assign";
+    axios.defaults.headers.common['Authorization'] = token;
+    axios.post(URL, {
+      orderId :orderId,
+      staffId : staffId
+    }).then(r => {
+      if (r.status == 200) {
+        setData(r.data);
+      } else {
+        setData(undefined);
+      }
+    }).catch(e => {
+      setData(undefined);
+    });
+  }
   function generatePage() {
     return (
       <Card
@@ -135,14 +163,15 @@ const LatestOrders = props => {
                       </Tooltip>
                     </TableCell>
                     <TableCell>Status</TableCell>
+                    <TableCell>Assign</TableCell>
+                    <TableCell>View</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {data.map(order => (
+                  {data.order.map(order => (
                     <TableRow
                       hover
                       key={order.id}
-                      onClick={()=>viewOrderDetail(order.id)}
                       style={{cursor:"pointer"}}
                     >
                       <TableCell>{order.id}</TableCell>
@@ -154,6 +183,20 @@ const LatestOrders = props => {
                         <div className={classes.statusContainer}>
                           {order.status}
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        <Select value={order.id.toString() + "-" + (order.personInCharge === null ? '' : order.personInCharge.id).toString()}
+                                onChange={assignStaff}>
+                          {data.staff.map(staff=>(
+                            <MenuItem value={order.id.toString() + "-" + staff.id.toString()}>{staff.username}</MenuItem>
+                          ))}
+
+                        </Select>
+                      </TableCell>
+                      <TableCell>
+                        <Button color="primary"  size="small"variant="text" onClick={()=>viewOrderDetail(order.id)}>
+                          View
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}

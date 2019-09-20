@@ -4,6 +4,7 @@ import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.ok;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.Constant;
 import com.example.demo.jwt.JwtTokenProvider;
 import com.example.demo.model.OrderRecord;
 import com.example.demo.model.User;
@@ -81,12 +83,16 @@ public class OrderController {
   }
 
   @RequestMapping(value = "/assign", method = RequestMethod.POST)
-  public ResponseEntity assignOrder(Model model, @RequestBody AssignOrderRequest assignOrderRequest) {
+  public ResponseEntity assignOrder(Model model, @RequestBody AssignOrderRequest assignOrderRequest,
+      @RequestHeader("Authorization") String authorization) {
     try {
+      String userName = jwtTokenProvider.getUsername(authorization.substring(7));
+      User user = userRepository.findUserByUsername(userName);
+
       OrderRecord orderRecord = orderRepository.findById(assignOrderRequest.getOrderId()).get();
       LocalDateTime assignDateTime = LocalDateTime.now();
       User staff = userRepository.findById(assignOrderRequest.getStaffId()).get();
-      User manager = userRepository.findById(assignOrderRequest.getManagerId()).get();
+      User manager = userRepository.findById(user.getId()).get();
       orderRecord.setId(assignOrderRequest.getOrderId());
       orderRecord.setAssignDateTime(assignDateTime);
       orderRecord.setManagerInCharge(manager);
@@ -123,8 +129,12 @@ public class OrderController {
     try {
       String userName = jwtTokenProvider.getUsername(authorization.substring(7));
       User user = userRepository.findUserByUsername(userName);
-      OrderRecord orderRecord = orderRepository.findById(orderId, user.getId()).get();
-
+      OrderRecord orderRecord;
+      if (user.getRole().getName().equals("ADMIN")){
+        orderRecord = orderRepository.findById(orderId).get();
+      }else{
+        orderRecord = orderRepository.findById(orderId, user.getId()).get();
+      }
       model.addAttribute("order", orderRecord);
       model.addAttribute("role", user.getRole().getName());
       return ok(model);
@@ -163,8 +173,22 @@ public class OrderController {
     try {
       String userName = jwtTokenProvider.getUsername(authorization.substring(7));
       User user = userRepository.findUserByUsername(userName);
-      List<Optional<OrderRecord>> listOrder = orderRepository.findList(user.getId());
-      model.addAttribute("order", listOrder.stream().map(Optional::get).collect(Collectors.toList()));
+      List<User> staffs = new ArrayList<>();
+      userRepository.findAll().forEach(staff->{
+        if(staff.getRole().getName().equals(Constant.STAFF)){
+          staffs.add(staff);
+        }
+      });
+      List<OrderRecord> listOrder =  new ArrayList<>();
+      if (user.getRole().getName().equals(Constant.ADMIN)){
+        List<OrderRecord> finalListOrder = listOrder;
+        orderRepository.findAll().forEach(order-> finalListOrder.add(order));
+      }else{
+        listOrder = orderRepository.findList(user.getId()).stream().map(Optional::get).collect(Collectors.toList());
+      }
+
+      model.addAttribute("order", listOrder);
+      model.addAttribute("staff", staffs);
       return ok(model);
     } catch (Exception e) {
       logger.error(e.getMessage());
