@@ -28,7 +28,7 @@ function App() {
                     <Route path='/ship' component={Checkout}/>
                     <Route path='/order' component={LatestOrders}/>
                     <Route path='/orderDetail' component={OrderDetail}/>
-                    <Route path='/editOrder' component={EditOrder}/>
+                    <Route path='/editDetail' component={EditOrder}/>
                 </Switch>
             </Router>
         </ThemeProvider>
