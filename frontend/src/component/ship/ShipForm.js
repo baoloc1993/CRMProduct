@@ -48,19 +48,27 @@ export default function ShipForm(props) {
             rate: 0.00,
             totalValueVnd: 0,
             note: "",
+            number: 0,
             status: ""
         };
     }
 
 
     const classes = useStyles();
-
-
-    function handleUpdate() {
-        let token = Cookies.get('access_token');
-        token = ("Bearer " + token);
+    function handleConfirm(){
         let url = window.location.href;
         let orderID = url.split("=")[1];
+        if (orderID !== undefined){
+            handleUpdate(orderID);
+        }else{
+            handleSubmit();
+        }
+    }
+
+    function handleUpdate(orderID) {
+        let token = Cookies.get('access_token');
+        token = ("Bearer " + token);
+
         axios.defaults.headers.common['Authorization'] = token;
         axios.post("http://localhost:8080/order/update", {
             orderId: orderID,
@@ -73,7 +81,8 @@ export default function ShipForm(props) {
             rate: form.rate,
             totalValueVnd: form.totalValueVnd,
             note: form.note,
-            status: form.status
+            status: form.status,
+            number: form.number
         }).then(r => {
             if (r.status == 200) {
                 alert("SUCCESS");
@@ -99,7 +108,8 @@ export default function ShipForm(props) {
             rate: form.rate,
             totalValueVnd: form.totalValueVnd,
             note: form.note,
-            status: form.status
+            status: form.status,
+            number: form.number
         }).then(r => {
             if (r.status == 200) {
                 alert("SUCCESS");
@@ -165,6 +175,7 @@ export default function ShipForm(props) {
                 <Grid item xs={12}>
                     <TextField
                         value={form.usdPrice}
+                        type="number"
                         required
                         id="usdPrice"
                         name="usdPrice"
@@ -180,6 +191,7 @@ export default function ShipForm(props) {
                 <Grid item xs={12} style={{display: checkRole(role, ["STAFF", "MANAGER", "ADMIN"])}}>
                     <TextField
                         value={form.tax}
+                        type="number"
                         id="tax"
                         name="tax"
                         label="Tax"
@@ -194,6 +206,7 @@ export default function ShipForm(props) {
                 <Grid item xs={12} style={{display: checkRole(role, ["MANAGER", "ADMIN"])}}>
                     <TextField
                         value={form.totalValueUsd}
+                        type="number"
                         id="totalValueUSD"
                         name="totalValueUSD"
                         label="Tổng giá trị đơn (USD)"
@@ -208,6 +221,7 @@ export default function ShipForm(props) {
                 <Grid item xs={12} style={{display: checkRole(role, ["MANAGER", "ADMIN"])}}>
                     <TextField
                         value={form.rate}
+                        type="number"
                         id="rate"
                         name="rate"
                         label="Tỉ giá"
@@ -222,6 +236,7 @@ export default function ShipForm(props) {
                 <Grid item xs={12} style={{display: checkRole(role, ["MANAGER", "ADMIN"])}}>
                     <TextField
                         value={form.totalValueVnd}
+                        type="number"
                         id="totalValueVND"
                         name="totalValueVND"
                         label="Tổng giá trị đơn (VND)"
@@ -232,7 +247,22 @@ export default function ShipForm(props) {
                         }}
                     />
                 </Grid>
-                <Grid item xs={12} sm={12} style={{display: checkRole(role, ["MANAGER", "ADMIN"])}}>
+                <Grid item xs={12} sm={12} style={{display: checkRole(role, ["CUSTOMER", "MANAGER", "ADMIN"])}}>
+                    <TextField
+                        value={form.number}
+                        type="number"
+                        id="number"
+                        name="number"
+                        label="Number Order"
+                        fullWidth
+                        autoComplete="number"
+                        onChange={(event) => handleInputChange(event)}
+                        InputProps={{
+                            readOnly: disable,
+                            shrink: true,
+                        }}/>
+                </Grid>
+                <Grid item xs={12} sm={12} style={{display: checkRole(role, ["CUSTOMER", "MANAGER", "ADMIN"])}}>
                     <TextField
                         value={form.note}
                         id="note"
@@ -260,12 +290,8 @@ export default function ShipForm(props) {
                     />
                 </Grid>
                 <div className={classes.buttons} style={{display: disable ? 'none' : 'block'}}>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={(data === undefined) ? handleSubmit : handleUpdate}
-                        className={classes.button}
-                    >
+                    <Button variant="contained" color="primary"
+                            onClick={handleConfirm} className={classes.button}>
                         Xác nhận
                     </Button>
                 </div>
