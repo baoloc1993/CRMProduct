@@ -53,13 +53,48 @@ public class OrderController {
   @Autowired
   StatusRepository statusRepository;
 
-  @RequestMapping(value = "/create", method = RequestMethod.POST)
-  public ResponseEntity createOrder(Model model, @RequestBody OrderRequest orderRequest,
+  @RequestMapping(value = "/update", method = RequestMethod.POST)
+  public ResponseEntity updateOrder(Model model, @RequestBody OrderRequest orderRequest,
       @RequestHeader("Authorization") String authorization) {
     try {
       if (StringUtils.isEmpty(orderRequest.getOrderLink())
           || StringUtils.isEmpty(orderRequest.getAddress())
           || orderRequest.getUsdPrice() <= 0) {
+        return badRequest().build();
+      }
+      String userName = jwtTokenProvider.getUsername(authorization.substring(7));
+      OrderRecord orderRecord = new OrderRecord();
+      LocalDateTime registerDateTime = LocalDateTime.now();
+      User user = userRepository.findUserByUsername(userName);
+      orderRecord.setId(orderRequest.getOrderId());
+      orderRecord.setAddress(orderRequest.getAddress());
+      orderRecord.setCustomer(user);
+      orderRecord.setNote(orderRequest.getNote());
+      orderRecord.setOrderDateTime(registerDateTime);
+      orderRecord.setOrderLink(orderRequest.getOrderLink());
+      orderRecord.setRate(orderRequest.getRate());
+      orderRecord.setAddress(orderRequest.getAddress());
+      orderRecord.setUsdPrice(orderRequest.getUsdPrice());
+      orderRecord.setRate(orderRequest.getRate());
+      orderRecord.setTotalValueUsd(orderRequest.getTotalValueUsd());
+      orderRecord.setTotalValueVnd(orderRequest.getTotalValueVnd());
+      OrderStatus orderStatus =  statusRepository.findById(Constant.NEW).get();
+      orderRecord.setStatus(orderStatus);
+      orderRepository.save(orderRecord);
+      return ok().build();
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+      e.printStackTrace();
+      return badRequest().build();
+    }
+  }
+  @RequestMapping(value = "/create", method = RequestMethod.POST)
+  public ResponseEntity createOrder(Model model, @RequestBody OrderRequest orderRequest,
+                                    @RequestHeader("Authorization") String authorization) {
+    try {
+      if (StringUtils.isEmpty(orderRequest.getOrderLink())
+              || StringUtils.isEmpty(orderRequest.getAddress())
+              || orderRequest.getUsdPrice() <= 0) {
         return badRequest().build();
       }
       String userName = jwtTokenProvider.getUsername(authorization.substring(7));
