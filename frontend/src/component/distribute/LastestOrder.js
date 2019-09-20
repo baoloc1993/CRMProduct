@@ -186,7 +186,9 @@ const LatestOrders = props => {
                       </TableCell>
                       <TableCell>
                         <Select value={order.id.toString() + "-" + (order.personInCharge === null ? '' : order.personInCharge.id).toString()}
-                                onChange={assignStaff}>
+                                onChange={assignStaff}
+                                readOnly ={order.personInCharge !== null}
+                        >
                           {data.staff.map(staff=>(
                             <MenuItem value={order.id.toString() + "-" + staff.id.toString()}>{staff.username}</MenuItem>
                           ))}
