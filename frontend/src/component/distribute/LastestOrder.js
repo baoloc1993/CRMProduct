@@ -108,6 +108,10 @@ const LatestOrders = props => {
     props.history.push('/orderDetail?orderId=' + orderId);
 
   }
+    function editOrderDetail(orderId) {
+        props.history.push('/editDetail?orderId=' + orderId);
+
+    }
   function completeOrder(orderId) {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
@@ -201,6 +205,7 @@ const LatestOrders = props => {
                     <TableCell>Status</TableCell>
                     <TableCell>Assign</TableCell>
                     <TableCell>View</TableCell>
+                      <TableCell>Edit</TableCell>
                     <TableCell>Process</TableCell>
                     <TableCell>Complete</TableCell>
                   </TableRow>
@@ -237,6 +242,11 @@ const LatestOrders = props => {
                           View
                         </Button>
                       </TableCell>
+                        <TableCell>
+                            <Button color="primary"  size="small"variant="text" onClick={()=>editOrderDetail(order.id)}>
+                                Edit
+                            </Button>
+                        </TableCell>
                       <TableCell>
                         <Button color="primary"  size="small"variant="text" onClick={()=>processOrder(order.id)}
                                 disabled={order.status.id >=2}

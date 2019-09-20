@@ -12,6 +12,7 @@ import { createBrowserHistory } from "history";
 import theme from './theme';
 import ShipForm from "./component/ship/ShipForm";
 import OrderDetail from "./component/order/OrderDetail";
+import EditOrder from "./component/order/EditOrder";
 
 
 
@@ -27,6 +28,7 @@ function App() {
                     <Route path='/ship' component={Checkout}/>
                     <Route path='/order' component={LatestOrders}/>
                     <Route path='/orderDetail' component={OrderDetail}/>
+                    <Route path='/editOrder' component={EditOrder}/>
                 </Switch>
             </Router>
         </ThemeProvider>
