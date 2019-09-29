@@ -4,7 +4,7 @@ import axios from "axios";
 export const authentication =  (url,callback) => {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
-    let URL = "http://localhost:8080/" + url;
+    let URL = "http://112.78.4.119:8080/" + url;
     axios.defaults.headers.common['Authorization'] = token;
     axios.post(URL, {
     }).then(r => {
@@ -24,7 +24,7 @@ export const authentication =  (url,callback) => {
 export const getRole =  (callback) => {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
-    let URL = "http://localhost:8080/getRole";
+    let URL = "http://112.78.4.119:8080/getRole";
     axios.defaults.headers.common['Authorization'] = token;
     axios.post(URL, {
     }).then(r => {

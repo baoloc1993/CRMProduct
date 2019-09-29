@@ -4,7 +4,6 @@ import moment from 'moment';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import PropTypes from 'prop-types';
 import {makeStyles} from '@material-ui/styles';
-import theme from "../../theme";
 import {
   Card,
   CardActions,
@@ -21,10 +20,6 @@ import {
   TableSortLabel
 } from '@material-ui/core';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
-
-import mockData from './data';
-import StatusBullet from "./StatusBullet";
-import {authentication} from "../Authentication";
 import Cookies from "js-cookie";
 import axios from "axios";
 import Select from "@material-ui/core/Select";
@@ -52,15 +47,7 @@ const useStyles = makeStyles(theme => ({
   paper: {},
 }));
 
-const statusColors = {
-  delivered: 'success',
-  pending: 'info',
-  refunded: 'danger'
-};
-
 const LatestOrders = props => {
-  const {className, ...rest} = props;
-
   const classes = useStyles();
 
 
@@ -70,7 +57,7 @@ const LatestOrders = props => {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
 
-    let URL = "http://localhost:8080/order/getList";
+    let URL = "http://112.78.4.119:8080/order/getList";
     axios.defaults.headers.common['Authorization'] = token;
     axios.get(URL, {}).then(r => {
       if (r.status == 200) {
@@ -116,7 +103,7 @@ const LatestOrders = props => {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
 
-    let URL = "http://localhost:8080/order/complete";
+    let URL = "http://112.78.4.119:8080/order/complete";
     axios.defaults.headers.common['Authorization'] = token;
     axios.post(URL, {
       orderId :orderId,
@@ -138,7 +125,7 @@ const LatestOrders = props => {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
 
-    let URL = "http://localhost:8080/order/assign";
+    let URL = "http://112.78.4.119:8080/order/assign";
     axios.defaults.headers.common['Authorization'] = token;
     axios.post(URL, {
       orderId :orderId,
@@ -157,7 +144,7 @@ const LatestOrders = props => {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
 
-    let URL = "http://localhost:8080/order/perform";
+    let URL = "http://112.78.4.119:8080/order/perform";
     axios.defaults.headers.common['Authorization'] = token;
     axios.post(URL, {
       orderId :orderId,
@@ -174,8 +161,7 @@ const LatestOrders = props => {
   function generatePage() {
     return (
       <Card
-        {...rest}
-        className={clsx(classes.root, className)}
+        className={clsx(classes.root)}
       >
         <CardHeader
           title="List Orders"

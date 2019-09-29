@@ -63,7 +63,7 @@ export default function OrderDetail() {
         let url = window.location.href;
         let orderID = url.split("=")[1];
 
-        let URL = "http://localhost:8080/order/get?orderId=" + orderID;
+        let URL = "http://112.78.4.119:8080/order/get?orderId=" + orderID;
         axios.defaults.headers.common['Authorization'] = token;
         axios.get(URL, {}).then(r => {
             if (r.status == 200) {

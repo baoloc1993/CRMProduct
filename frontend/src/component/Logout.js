@@ -6,7 +6,7 @@ import React from "react";
 export const logout =  () => {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
-    let URL = "http://localhost:8080/login/logout"
+    let URL = "http://112.78.4.119:8080/login/logout"
     axios.defaults.headers.common['Authorization'] = token;
     axios.post(URL, {
     }).then(r => {

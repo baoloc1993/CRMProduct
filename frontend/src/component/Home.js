@@ -4,11 +4,8 @@ import clsx from 'clsx';
 import {makeStyles} from '@material-ui/styles';
 import {List, ListItem, Button, colors} from '@material-ui/core';
 import {ArrowBack, Shop, ShoppingCart} from "@material-ui/icons";
-import Redirect from "react-router-dom/es/Redirect";
 import {authentication} from "./Authentication";
-import Cookies from "js-cookie";
-import axios from "axios";
-import mockData from "./distribute/data";
+
 
 const useStyles = makeStyles(theme => ({
     root: {},
@@ -93,11 +90,9 @@ function Home(props) {
         return (<div/>)
     }
     function generatePage() {
-        const {className, ...rest} = props;
 
         return (
             <List
-                {...rest}
                 className={clsx(classes.root)}
             >
                 {pages.map(page => (

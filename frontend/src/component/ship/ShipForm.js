@@ -70,7 +70,7 @@ export default function ShipForm(props) {
         token = ("Bearer " + token);
 
         axios.defaults.headers.common['Authorization'] = token;
-        axios.post("http://localhost:8080/order/update", {
+        axios.post("http://112.78.4.119:8080/order/update", {
             orderId: orderID,
             orderLink: form.orderLink,
             trackingLink: form.trackingLink,
@@ -98,7 +98,7 @@ export default function ShipForm(props) {
         let token = Cookies.get('access_token');
         token = ("Bearer " + token);
         axios.defaults.headers.common['Authorization'] = token;
-        axios.post("http://localhost:8080/order/update", {
+        axios.post("http://112.78.4.119:8080/order/update", {
             orderLink: form.orderLink,
             trackingLink: form.trackingLink,
             address: form.address,

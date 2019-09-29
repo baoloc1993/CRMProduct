@@ -61,10 +61,10 @@ export default function SignIn(props) {
   function login() {
     console.log(user);
 
-    let url = "http://localhost:8080/login/process?username=" + user.username + "&password=" + user.password;
+    let url = "http://112.78.4.119:8080/login/process?username=" + user.username + "&password=" + user.password;
     axios.post(url, {
       headers: {
-        'Hose': 'localhost:8080',
+        'Hose': '112.78.4.119:8080',
         'Access-Control-Allow-Origin': '*',
         "Accept": "*/*",
         "Content-Type": "application/x-www-form-urlencoded",
