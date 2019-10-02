@@ -1,7 +1,7 @@
-POST http://localhost:8080/order/assign
+GET http://112.78.4.119:8080/migrateData
 Accept: */*
 Cache-Control: no-cache
-
+Authorization:
 
 <> 2019-09-19T111343.403.json
 <> 2019-09-19T111228.403.json

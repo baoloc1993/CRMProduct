@@ -5,6 +5,7 @@ import Button from "@material-ui/core/Button";
 import {makeStyles} from "@material-ui/core";
 import axios from "axios";
 import Cookies from "js-cookie";
+import {Route} from "react-router";
 
 const useStyles = makeStyles(theme => ({
     appBar: {
@@ -30,8 +31,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-
-export default function ShipForm(props) {
+const ShipForm = props => {
     let role = props.role;
     let disable = props.disable;
     let data = props.data;
@@ -49,7 +49,8 @@ export default function ShipForm(props) {
             totalValueVnd: 0,
             note: "",
             number: 0,
-            status: ""
+            status: "",
+            customerName: ""
         };
     }
 
@@ -82,10 +83,13 @@ export default function ShipForm(props) {
             totalValueVnd: form.totalValueVnd,
             note: form.note,
             status: form.status,
-            number: form.number
+            number: form.number,
+            customerName : form.customerName
         }).then(r => {
             if (r.status == 200) {
                 alert("SUCCESS");
+                window.location.href="/order";
+
             } else {
                 alert("FAIL");
 
@@ -109,10 +113,12 @@ export default function ShipForm(props) {
             totalValueVnd: form.totalValueVnd,
             note: form.note,
             status: form.status,
-            number: form.number
+            number: form.number,
+            customerName  :form.customerName
         }).then(r => {
             if (r.status == 200) {
                 alert("SUCCESS");
+                window.location.href="/order";
             } else {
                 alert("FAIL");
 
@@ -130,6 +136,21 @@ export default function ShipForm(props) {
             <Grid container spacing={3}>
                 <Grid item xs={12} sm={12}>
                     <TextField
+                        value={form.customerName}
+                        required
+                        id="customerName"
+                        name="customerName"
+                        label="Tên khách hàng"
+                        fullWidth
+                        autoComplete="customerName"
+                        onChange={(event) => handleInputChange(event)}
+                        InputProps={{
+                            readOnly: disable,
+                        }}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={12}>
+                    <TextField
                         value={form.orderLink}
                         required
                         id="orderLink"
@@ -143,6 +164,7 @@ export default function ShipForm(props) {
                         }}
                     />
                 </Grid>
+
                 <Grid item xs={12} sm={12} style={{display: checkRole(role, ["STAFF", "MANAGER", "ADMIN"])}}>
                     <TextField
                         value={form.trackingLink}
@@ -303,3 +325,5 @@ export default function ShipForm(props) {
 function checkRole(role, listRoles) {
     return listRoles.includes(role) ? "block" : "none";
 }
+
+export default ShipForm;
