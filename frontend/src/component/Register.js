@@ -60,7 +60,9 @@ export default function SignIn(props) {
 
 
   function addUser() {
-
+    let token = Cookies.get('access_token');
+    token = ("Bearer " + token);
+    axios.defaults.headers.common['Authorization'] = token;
     let url = "http://112.78.4.119:8080/login/addUser";
     axios.post(url, {
       username : user.username,
@@ -69,6 +71,11 @@ export default function SignIn(props) {
     }).then(r => {
       if (r.status == 200) {
         alert("OK");
+        setUser({
+          username: "",
+          password : "",
+          name : ""
+        });
       } else {
         alert("Fail");
       }
@@ -101,6 +108,7 @@ export default function SignIn(props) {
             label="User Name"
             name="username"
             autoComplete="email"
+            value = {user.username}
             onChange={(event)=>handleInputChange(event)}
             autoFocus
           />
@@ -114,6 +122,7 @@ export default function SignIn(props) {
             type="password"
             id="password"
             autoComplete="current-password"
+            value = {user.password}
             onChange={(event)=>handleInputChange(event)}
 
           />
@@ -127,6 +136,7 @@ export default function SignIn(props) {
             type="name"
             id="name"
             autoComplete="name"
+            value = {user.name}
             onChange={(event)=>handleInputChange(event)}
 
           />

@@ -57,8 +57,6 @@ const LatestOrders = props => {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
     let url = window.location.href;
-
-
     let URL = "http://112.78.4.119:8080/order/getList";
     if (url.indexOf('customerId') > 0 ){
       let customerId = url.split("=")[1];
@@ -101,10 +99,10 @@ const LatestOrders = props => {
     props.history.push('/orderDetail?orderId=' + orderId);
 
   }
-    function editOrderDetail(orderId) {
-        props.history.push('/editDetail?orderId=' + orderId);
+  function editOrderDetail(orderId) {
+      props.history.push('/editDetail?orderId=' + orderId);
 
-    }
+  }
   function completeOrder(orderId) {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
@@ -122,6 +120,9 @@ const LatestOrders = props => {
     }).catch(e => {
       setData(undefined);
     });
+  };
+  function goToCustomer(customerId){
+    window.location.href = "/order?customerId=" + customerId;
   }
   function assignStaff(event) {
     let value =  event.target.value;
@@ -198,8 +199,8 @@ const LatestOrders = props => {
                       key={order.id}
                     >
                       <TableCell>{order.id}</TableCell>
-                      <TableCell>
-                        <div style={{cursor: "pointer"}} onClick={window.location.href = '/order?customerId=' + order.customer.id}>
+                      <TableCell  onClick={()=>goToCustomer(order.customer.id)}>
+                        <div style={{cursor: "pointer"}}  >
                         {order.customer.name}
                         </div>
                       </TableCell>
