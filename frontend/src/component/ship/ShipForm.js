@@ -134,21 +134,7 @@ const ShipForm = props => {
     return (
         <React.Fragment>
             <Grid container spacing={3}>
-                <Grid item xs={12} sm={12}>
-                    <TextField
-                        value={form.customerName}
-                        required
-                        id="customerName"
-                        name="customerName"
-                        label="Tên khách hàng"
-                        fullWidth
-                        autoComplete="customerName"
-                        onChange={(event) => handleInputChange(event)}
-                        InputProps={{
-                            readOnly: disable,
-                        }}
-                    />
-                </Grid>
+
                 <Grid item xs={12} sm={12}>
                     <TextField
                         value={form.orderLink}
