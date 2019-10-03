@@ -53,87 +53,71 @@ public class OrderController {
     @Autowired
     StatusRepository statusRepository;
 
-    @RequestMapping(value = "/*", method = RequestMethod.OPTIONS)
-    public ResponseEntity handleOption(Model model) {
-        return ok(model);
+  @RequestMapping(value = "/*",method = RequestMethod.OPTIONS)
+  public ResponseEntity handleOption(Model model){
+    return ok(model);
+  }
+  @RequestMapping(value = "/update", method = RequestMethod.POST)
+  public ResponseEntity updateOrder(Model model, @RequestBody OrderRequest orderRequest,
+      @RequestHeader("Authorization") String authorization) {
+    try {
+      if (StringUtils.isEmpty(orderRequest.getOrderLink())
+          || StringUtils.isEmpty(orderRequest.getAddress())
+          || orderRequest.getUsdPrice() <= 0) {
+        return badRequest().build();
+      }
+      OrderRecord orderRecord = new OrderRecord();
+      orderRecord.setId(orderRequest.getOrderId());
+      addOrder(orderRequest, orderRecord, authorization);
+      return ok().build();
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+      e.printStackTrace();
+      return badRequest().build();
     }
+  }
 
-    @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public ResponseEntity updateOrder(Model model, @RequestBody OrderRequest orderRequest,
-                                      @RequestHeader("Authorization") String authorization) {
-        try {
-            if (StringUtils.isEmpty(orderRequest.getOrderLink())
-                    || StringUtils.isEmpty(orderRequest.getAddress())
-                    || orderRequest.getUsdPrice() <= 0) {
-                return badRequest().build();
-            }
-            String userName = jwtTokenProvider.getUsername(authorization.substring(7));
-            OrderRecord orderRecord = new OrderRecord();
-            LocalDateTime registerDateTime = LocalDateTime.now();
-            User user = userRepository.findUserByUsername(userName);
-            orderRecord.setId(orderRequest.getOrderId());
-            orderRecord.setAddress(orderRequest.getAddress());
-            orderRecord.setCustomer(user);
-            orderRecord.setNote(orderRequest.getNote());
-            orderRecord.setOrderDateTime(registerDateTime);
-            orderRecord.setOrderLink(orderRequest.getOrderLink());
-            orderRecord.setRate(orderRequest.getRate());
-            orderRecord.setAddress(orderRequest.getAddress());
-            orderRecord.setNumber(orderRequest.getNumber());
-            orderRecord.setUsdPrice(orderRequest.getUsdPrice());
-            orderRecord.setTax(orderRequest.getTax());
-            float totalValueUsd = orderRequest.getUsdPrice() * (1 + orderRequest.getTax());
-            orderRecord.setTotalValueUsd(totalValueUsd);
-            orderRecord.setTotalValueVnd(totalValueUsd * (orderRequest.getRate()));
-            OrderStatus orderStatus = statusRepository.findById(Constant.NEW).get();
-            orderRecord.setStatus(orderStatus);
-            orderRecord.setCustomerName(orderRequest.getCustomerName());
-            orderRepository.save(orderRecord);
-            return ok().build();
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            e.printStackTrace();
-            return badRequest().build();
-        }
+  private void addOrder(@RequestBody OrderRequest orderRequest,
+      OrderRecord orderRecord, String authorization) {
+    String userName = jwtTokenProvider.getUsername(authorization.substring(7));
+    LocalDateTime registerDateTime = LocalDateTime.now();
+    User user = userRepository.findUserByUsername(userName);
+    orderRecord.setAddress(orderRequest.getAddress());
+    orderRecord.setCustomer(user);
+    orderRecord.setNote(orderRequest.getNote());
+    orderRecord.setOrderDateTime(registerDateTime);
+    orderRecord.setOrderLink(orderRequest.getOrderLink());
+    orderRecord.setRate(orderRequest.getRate());
+    orderRecord.setNumber(orderRequest.getNumber());
+    orderRecord.setUsdPrice(orderRequest.getUsdPrice());
+    orderRecord.setRate(orderRequest.getRate());
+    orderRecord.setTax(orderRequest.getTax());
+    float totalValueUsd = orderRequest.getUsdPrice() * (1 + orderRequest.getTax());
+    orderRecord.setTotalValueUsd(totalValueUsd);
+    orderRecord.setTotalValueVnd(totalValueUsd * orderRequest.getRate());
+    OrderStatus orderStatus = statusRepository.findById(Constant.NEW).get();
+    orderRecord.setStatus(orderStatus);
+    orderRepository.save(orderRecord);
+  }
+
+  @RequestMapping(value = "/create", method = RequestMethod.POST)
+  public ResponseEntity createOrder(Model model, @RequestBody OrderRequest orderRequest,
+                                    @RequestHeader("Authorization") String authorization) {
+    try {
+      if (StringUtils.isEmpty(orderRequest.getOrderLink())
+              || StringUtils.isEmpty(orderRequest.getAddress())
+              || orderRequest.getUsdPrice() <= 0) {
+        return badRequest().build();
+      }
+      OrderRecord orderRecord = new OrderRecord();
+      addOrder(orderRequest, orderRecord, authorization);
+      return ok().build();
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+      e.printStackTrace();
+      return badRequest().build();
     }
-
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ResponseEntity createOrder(Model model, @RequestBody OrderRequest orderRequest,
-                                      @RequestHeader("Authorization") String authorization) {
-        try {
-            if (StringUtils.isEmpty(orderRequest.getOrderLink())
-                    || StringUtils.isEmpty(orderRequest.getAddress())
-                    || orderRequest.getUsdPrice() <= 0) {
-                return badRequest().build();
-            }
-            String userName = jwtTokenProvider.getUsername(authorization.substring(7));
-            OrderRecord orderRecord = new OrderRecord();
-            LocalDateTime registerDateTime = LocalDateTime.now();
-            User user = userRepository.findUserByUsername(userName);
-            orderRecord.setAddress(orderRequest.getAddress());
-            orderRecord.setCustomer(user);
-            orderRecord.setNote(orderRequest.getNote());
-            orderRecord.setOrderDateTime(registerDateTime);
-            orderRecord.setOrderLink(orderRequest.getOrderLink());
-            orderRecord.setRate(orderRequest.getRate());
-            orderRecord.setNumber(orderRequest.getNumber());
-            orderRecord.setUsdPrice(orderRequest.getUsdPrice());
-            orderRecord.setTax(orderRequest.getTax());
-            float totalValueUsd = orderRequest.getUsdPrice() * (1 + orderRequest.getTax());
-            orderRecord.setTotalValueUsd(totalValueUsd);
-            orderRecord.setTotalValueVnd(totalValueUsd * (1 + orderRequest.getRate()));
-            OrderStatus orderStatus = statusRepository.findById(Constant.NEW).get();
-            orderRecord.setStatus(orderStatus);
-            orderRecord.setCustomerName(orderRequest.getCustomerName());
-
-            orderRepository.save(orderRecord);
-            return ok().build();
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            e.printStackTrace();
-            return badRequest().build();
-        }
-    }
+  }
 
     @RequestMapping(value = "/assign", method = RequestMethod.POST)
     public ResponseEntity assignOrder(Model model, @RequestBody AssignOrderRequest assignOrderRequest,
@@ -214,17 +198,29 @@ public class OrderController {
         }
     }
 
-    @RequestMapping(value = "/getListByPIC", method = RequestMethod.GET)
-    public ResponseEntity getListOrderByPIC(Model model, @RequestParam int picId) {
-        try {
-            List<Optional<OrderRecord>> listOrder = orderRepository.findListOrderByPIC(picId);
-            model.addAttribute("order", listOrder.stream().map(Optional::get).collect(Collectors.toList()));
-            return ok(model);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return badRequest().build();
-        }
+  @RequestMapping(value = "/getListByPIC", method = RequestMethod.GET)
+  public ResponseEntity getListOrderByPIC(Model model, @RequestParam int picId) {
+    try {
+      List<Optional<OrderRecord>> listOrder = orderRepository.findListOrderByPIC(picId);
+      model.addAttribute("order", listOrder.stream().map(Optional::get).collect(Collectors.toList()));
+      return ok(model);
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+      return badRequest().build();
     }
+  }
+
+  @RequestMapping(value = "/getListByCustomer", method = RequestMethod.GET)
+  public ResponseEntity getListOrderByCustomer(Model model, @RequestParam int customerId) {
+    try {
+      List<Optional<OrderRecord>> listOrder = orderRepository.findListOrderByCustomer(customerId);
+      model.addAttribute("order", listOrder.stream().map(Optional::get).collect(Collectors.toList()));
+      return ok(model);
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+      return badRequest().build();
+    }
+  }
 
     @RequestMapping(value = "/getListByManager", method = RequestMethod.GET)
     public ResponseEntity getListOrderByManager(Model model, @RequestParam int managerId) {

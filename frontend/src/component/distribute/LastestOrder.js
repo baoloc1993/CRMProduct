@@ -56,8 +56,14 @@ const LatestOrders = props => {
   function getData(callback) {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
+    let url = window.location.href;
+
 
     let URL = "http://112.78.4.119:8080/order/getList";
+    if (url.indexOf('customerId') > 0 ){
+      let customerId = url.split("=")[1];
+      URL = "http://112.78.4.119:8080/order/getListByCustomer?customerId=" + customerId;
+    }
     axios.defaults.headers.common['Authorization'] = token;
     axios.get(URL, {}).then(r => {
       if (r.status == 200) {
@@ -174,20 +180,9 @@ const LatestOrders = props => {
                 <TableHead>
                   <TableRow>
                     <TableCell>Order Ref</TableCell>
+                    <TableCell>Customer Name</TableCell>
                     <TableCell>Order Link</TableCell>
-                    <TableCell>
-                      <Tooltip
-                        enterDelay={300}
-                        title="Sort"
-                      >
-                        <TableSortLabel
-                          active
-                          direction="desc"
-                        >
-                          Order Date Time
-                        </TableSortLabel>
-                      </Tooltip>
-                    </TableCell>
+                    <TableCell>Order Date Time</TableCell>
                     <TableCell>Status</TableCell>
                     <TableCell>Assign</TableCell>
                     <TableCell>View</TableCell>
@@ -203,6 +198,11 @@ const LatestOrders = props => {
                       key={order.id}
                     >
                       <TableCell>{order.id}</TableCell>
+                      <TableCell>
+                        <div style={{cursor: "pointer"}} onClick={window.location.href = '/order?customerId=' + order.customer.id}>
+                        {order.customer.name}
+                        </div>
+                      </TableCell>
                       <TableCell>{order.orderLink}</TableCell>
                       <TableCell>
                         {moment(order.orderDateTime).format('DD/MM/YYYY')}
