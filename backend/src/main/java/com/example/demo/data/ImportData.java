@@ -6,25 +6,18 @@ import com.example.demo.model.OrderStatus;
 import com.example.demo.model.User;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.UserRepository;
-import org.aspectj.weaver.ast.Or;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Scanner;
 
 public class ImportData {
     private static final int ORDER_LINK = 1;
     private static final int TRACK_LINK = 2;
-    private static final int CUSTOMER = 4;
+    private static final int ADDRESS = 4;
     private static final int QUANTITY = 5;
     private static final int USD_PRICE = 6;
     private static final int TAX = 7;
@@ -50,7 +43,7 @@ public class ImportData {
             String orderLink = data[ORDER_LINK];
             if (StringUtils.isEmpty(orderLink)) continue;
             String trackLink = data[TRACK_LINK];
-            String customer = data[CUSTOMER].replace("\"","");
+            String address = data[ADDRESS].replace("\"","");
             String quantity = data[QUANTITY];
             String usdPrice = data[USD_PRICE];
             String tax = data[TAX];
@@ -59,8 +52,6 @@ public class ImportData {
             String rate = data[RATE];
             if (StringUtils.isEmpty(rate)) rate = "0";
             String totalVND = data[TOTAL_VND].replace(",","");
-            String customerName = customer.split(",")[0];
-            String address = customer.replace(customerName + ",","");
             OrderRecord orderRecord = new OrderRecord();
             LocalDateTime registerDateTime = LocalDateTime.now();
             orderRecord.setAddress(address);
@@ -83,7 +74,6 @@ public class ImportData {
             OrderStatus orderStatus = new OrderStatus();
             orderStatus.setId(Constant.COMPLETE);
             orderRecord.setStatus(orderStatus);
-            orderRecord.setCustomerName(customerName);
             orderRecord.setTrackingLink(trackLink);
             orderRecord.setTax(Float.parseFloat(tax));
             orderRecords.add(orderRecord);

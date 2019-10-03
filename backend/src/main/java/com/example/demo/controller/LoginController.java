@@ -98,6 +98,9 @@ public class LoginController {
     @RequestMapping(value = "/addUser" ,method = RequestMethod.POST)
     public ResponseEntity addUser(Model model, @RequestBody AuthenticationRequest authenticationRequest) {
 
+        if (userRepository.findUserByUsername(authenticationRequest.getUsername()) != null){
+            return badRequest().build();
+        }
         User user  = new User();
         user.setName(authenticationRequest.getName());
         user.setUsername(authenticationRequest.getUsername());
