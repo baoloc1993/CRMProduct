@@ -9,6 +9,12 @@ public interface Constant {
   String ADMIN = "ADMIN";
   String MANAGER = "MANAGER";
 
+
+  int ROLE_ADMIN = 1;
+  int ROLE_MANAGER = 3;
+  int ROLE_STAFF = 2;
+  int ROLE_CUSTOMER = 4;
+
   /**
    * Order Status
    */

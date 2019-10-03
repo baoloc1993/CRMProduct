@@ -1,11 +1,14 @@
 package com.example.demo.controller;
 
 import com.example.demo.Constant;
-import com.example.demo.PdfUserDetails;
 import com.example.demo.jwt.JwtTokenProvider;
-import com.example.demo.model.TokenStatus;
+import com.example.demo.model.Role;
+import com.example.demo.model.User;
+import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.TokenRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.request.AuthenticationRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +35,9 @@ public class LoginController {
     @Autowired
     JwtTokenProvider jwtTokenProvider;
     @Autowired
-    UserRepository users;
+    UserRepository userRepository;
+    @Autowired
+    RoleRepository roleRepository;
 
     @Autowired
     TokenRepository tokenRepository;
@@ -52,7 +57,7 @@ public class LoginController {
         // read principal out of security context and set it to session
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-            String token = jwtTokenProvider.createToken(username, this.users.findUserByUsername(username).getRole());
+            String token = jwtTokenProvider.createToken(username, this.userRepository.findUserByUsername(username).getRole());
 //            TokenStatus tokenStatus =  new TokenStatus();
 //            tokenStatus.setToken_str(token.substring(0, Constant.MAX_TOKEN_LENGTH));
 //            tokenStatus.setPermit(1);
@@ -89,9 +94,18 @@ public class LoginController {
             return ok(model);
 
     }
-    private void validatePrinciple(Object principal) {
-        if (!(principal instanceof PdfUserDetails)) {
-            throw new  IllegalArgumentException("Principal can not be null!");
-        }
+
+    @RequestMapping(value = "/addUser" ,method = RequestMethod.POST)
+    public ResponseEntity addUser(Model model, @RequestBody AuthenticationRequest authenticationRequest) {
+
+        User user  = new User();
+        user.setName(authenticationRequest.getName());
+        user.setUsername(authenticationRequest.getUsername());
+        user.setPassword(authenticationRequest.getPassword());
+        Role role = roleRepository.findById(Constant.ROLE_CUSTOMER).get();
+        user.setRole(role);
+        userRepository.save(user);
+        return ok().build();
     }
+
 }

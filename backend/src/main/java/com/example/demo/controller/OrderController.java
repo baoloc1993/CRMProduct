@@ -66,27 +66,9 @@ public class OrderController {
           || orderRequest.getUsdPrice() <= 0) {
         return badRequest().build();
       }
-      String userName = jwtTokenProvider.getUsername(authorization.substring(7));
       OrderRecord orderRecord = new OrderRecord();
-      LocalDateTime registerDateTime = LocalDateTime.now();
-      User user = userRepository.findUserByUsername(userName);
       orderRecord.setId(orderRequest.getOrderId());
-      orderRecord.setAddress(orderRequest.getAddress());
-      orderRecord.setCustomer(user);
-      orderRecord.setNote(orderRequest.getNote());
-      orderRecord.setOrderDateTime(registerDateTime);
-      orderRecord.setOrderLink(orderRequest.getOrderLink());
-      orderRecord.setRate(orderRequest.getRate());
-      orderRecord.setAddress(orderRequest.getAddress());
-      orderRecord.setNumber(orderRequest.getNumber());
-      orderRecord.setUsdPrice(orderRequest.getUsdPrice());
-      orderRecord.setRate(orderRequest.getRate());
-      float totalValueUsd = orderRequest.getUsdPrice()*(1+orderRequest.getTax());
-      orderRecord.setTotalValueUsd(totalValueUsd);
-      orderRecord.setTotalValueVnd(totalValueUsd*(orderRequest.getRate()));
-      OrderStatus orderStatus =  statusRepository.findById(Constant.NEW).get();
-      orderRecord.setStatus(orderStatus);
-      orderRepository.save(orderRecord);
+      addOrder(orderRequest, orderRecord, authorization);
       return ok().build();
     } catch (Exception e) {
       logger.error(e.getMessage());
@@ -94,6 +76,29 @@ public class OrderController {
       return badRequest().build();
     }
   }
+
+  private void addOrder(@RequestBody OrderRequest orderRequest,
+      OrderRecord orderRecord, String authorization) {
+    String userName = jwtTokenProvider.getUsername(authorization.substring(7));
+    LocalDateTime registerDateTime = LocalDateTime.now();
+    User user = userRepository.findUserByUsername(userName);
+    orderRecord.setAddress(orderRequest.getAddress());
+    orderRecord.setCustomer(user);
+    orderRecord.setNote(orderRequest.getNote());
+    orderRecord.setOrderDateTime(registerDateTime);
+    orderRecord.setOrderLink(orderRequest.getOrderLink());
+    orderRecord.setRate(orderRequest.getRate());
+    orderRecord.setNumber(orderRequest.getNumber());
+    orderRecord.setUsdPrice(orderRequest.getUsdPrice());
+    orderRecord.setRate(orderRequest.getRate());
+    float totalValueUsd = orderRequest.getUsdPrice() * (1 + orderRequest.getTax());
+    orderRecord.setTotalValueUsd(totalValueUsd);
+    orderRecord.setTotalValueVnd(totalValueUsd * orderRequest.getRate());
+    OrderStatus orderStatus = statusRepository.findById(Constant.NEW).get();
+    orderRecord.setStatus(orderStatus);
+    orderRepository.save(orderRecord);
+  }
+
   @RequestMapping(value = "/create", method = RequestMethod.POST)
   public ResponseEntity createOrder(Model model, @RequestBody OrderRequest orderRequest,
                                     @RequestHeader("Authorization") String authorization) {
@@ -103,26 +108,8 @@ public class OrderController {
               || orderRequest.getUsdPrice() <= 0) {
         return badRequest().build();
       }
-      String userName = jwtTokenProvider.getUsername(authorization.substring(7));
       OrderRecord orderRecord = new OrderRecord();
-      LocalDateTime registerDateTime = LocalDateTime.now();
-      User user = userRepository.findUserByUsername(userName);
-      orderRecord.setAddress(orderRequest.getAddress());
-      orderRecord.setCustomer(user);
-      orderRecord.setNote(orderRequest.getNote());
-      orderRecord.setOrderDateTime(registerDateTime);
-      orderRecord.setOrderLink(orderRequest.getOrderLink());
-      orderRecord.setRate(orderRequest.getRate());
-      orderRecord.setAddress(orderRequest.getAddress());
-      orderRecord.setNumber(orderRequest.getNumber());
-      orderRecord.setUsdPrice(orderRequest.getUsdPrice());
-      orderRecord.setRate(orderRequest.getRate());
-      float totalValueUsd = orderRequest.getUsdPrice()*(1+orderRequest.getTax());
-      orderRecord.setTotalValueUsd(totalValueUsd);
-      orderRecord.setTotalValueVnd(totalValueUsd*(1  +orderRequest.getRate()));
-      OrderStatus orderStatus =  statusRepository.findById(Constant.NEW).get();
-      orderRecord.setStatus(orderStatus);
-      orderRepository.save(orderRecord);
+      addOrder(orderRequest, orderRecord, authorization);
       return ok().build();
     } catch (Exception e) {
       logger.error(e.getMessage());
