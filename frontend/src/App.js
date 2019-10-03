@@ -14,6 +14,7 @@ import ShipForm from "./component/ship/ShipForm";
 import OrderDetail from "./component/order/OrderDetail";
 import EditOrder from "./component/order/EditOrder";
 import {logout} from "./component/Logout";
+import Register from "./component/Register";
 
 
 
@@ -31,6 +32,7 @@ function App() {
                     <Route path='/orderDetail' component={OrderDetail}/>
                     <Route path='/editDetail' component={EditOrder}/>
                     <Route path='/logout' component={logout}/>
+                  <Route path='/addUser' component={Register}/>
                 </Switch>
             </Router>
         </ThemeProvider>
