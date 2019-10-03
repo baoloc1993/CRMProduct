@@ -222,6 +222,18 @@ public class OrderController {
     }
   }
 
+  @RequestMapping(value = "/getListByCustomer", method = RequestMethod.GET)
+  public ResponseEntity getListOrderByCustomer(Model model, @RequestParam int customerId) {
+    try {
+      List<Optional<OrderRecord>> listOrder = orderRepository.findListOrderByCustomer(customerId);
+      model.addAttribute("order", listOrder.stream().map(Optional::get).collect(Collectors.toList()));
+      return ok(model);
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+      return badRequest().build();
+    }
+  }
+
   @RequestMapping(value = "/getListByManager", method = RequestMethod.GET)
   public ResponseEntity getListOrderByManager(Model model, @RequestParam int managerId) {
     try {
