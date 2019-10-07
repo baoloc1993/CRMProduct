@@ -102,7 +102,7 @@ const ShipForm = props => {
         let token = Cookies.get('access_token');
         token = ("Bearer " + token);
         axios.defaults.headers.common['Authorization'] = token;
-        axios.post("http://112.78.4.119:8080/order/update", {
+        axios.post("http://112.78.4.119:8080/order/create", {
             orderLink: form.orderLink,
             trackingLink: form.trackingLink,
             address: form.address,

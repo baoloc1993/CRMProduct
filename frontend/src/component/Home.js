@@ -3,8 +3,8 @@ import {NavLink as RouterLink} from 'react-router-dom';
 import clsx from 'clsx';
 import {makeStyles} from '@material-ui/styles';
 import {List, ListItem, Button, colors} from '@material-ui/core';
-import {ArrowBack, Shop, ShoppingCart} from "@material-ui/icons";
-import {authentication} from "./Authentication";
+import {ArrowBack, PersonAdd, Shop, ShoppingCart} from "@material-ui/icons";
+import {authentication, getRole} from "./Authentication";
 
 
 const useStyles = makeStyles(theme => ({
@@ -52,34 +52,44 @@ const pages = [
     {
         title: 'Create Order',
         href: '/ship',
-        icon: <Shop/>
+        icon: <Shop/>,
+        role : ['ADMIN',"CUSTOMER", "MANAGER"]
     },
     {
         title: 'View Orders',
         href: '/order',
-        icon: <ShoppingCart/>
+        icon: <ShoppingCart/>,
+        role : ['ADMIN',"CUSTOMER", "MANAGER"]
     },
     {
         title: 'Log out',
         href: '/logout',
-        icon: <ArrowBack/>
+        icon: <ArrowBack/>,
+        role : ['ADMIN',"CUSTOMER", "MANAGER"]
+    },
+
+    {
+        title: 'Add User',
+        href: '/addUser',
+        icon: <PersonAdd/>,
+        role : ['ADMIN']
     },
 ];
 
 
 function Home(props) {
     const classes = useStyles();
-    const [auth, setAuth] = React.useState(undefined);
-    authentication("auth/home", onChange);
-    if (auth === undefined){
-      return blank();
-    }else if (auth) {
+    const [userRole, setRole] = React.useState(undefined);
+    getRole((a)=>onChange(a));
+    if (userRole === undefined){
+        return blank();
+    }else if (userRole === "GUEST"){
+        return fail;
+    }else{
         return generatePage()
-    } else {
-        return fail()
     }
-    function onChange(auth) {
-        setAuth(auth);
+    function onChange(userRole) {
+        setRole(userRole);
     }
 
     function fail() {
@@ -100,6 +110,7 @@ function Home(props) {
                         className={classes.item}
                         disableGutters
                         key={page.title}
+                        style={{display: checkRole(userRole, page.role)}}
                     >
                         <Button
                             activeClassName={classes.active}
@@ -120,6 +131,8 @@ function Home(props) {
 
 
 };
-
+function checkRole(role, listRoles) {
+    return listRoles.includes(role) ? "block" : "none";
+}
 
 export default Home;

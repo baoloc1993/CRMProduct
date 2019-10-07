@@ -31,11 +31,29 @@ export const getRole =  (callback) => {
         if (r.status == 200) {
             callback(r.data.role);
         } else {
-            callback("CUSTOMER");
+            callback("GUEST");
         }
     }).catch(e =>{
         console.log(e);
-        callback("CUSTOMER");
+        callback("GUEST");
+    });
+
+};
+
+export const listRoles =  (callback) => {
+    let token = Cookies.get('access_token');
+    token = ("Bearer " + token);
+    let URL = "http://112.78.4.119:8080/listRoles";
+    axios.get(URL, {
+    }).then(r => {
+        if (r.status == 200) {
+            callback(r.data.roles);
+        } else {
+            callback([]);
+        }
+    }).catch(e =>{
+        console.log(e);
+        callback(undefined);
     });
 
 };

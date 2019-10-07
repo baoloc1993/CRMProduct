@@ -10,13 +10,17 @@ import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Cookies from 'js-cookie'
 import axios from "axios";
 import {Redirect} from "react-router-dom";
-import Authentication, {authentication} from "./Authentication";
-
+import Authentication, {authentication, getRole, listRoles} from "./Authentication";
+import NativeSelect from "@material-ui/core/NativeSelect";
+import {Select} from "@material-ui/core";
+import MenuItem from "@material-ui/core/MenuItem";
+import InputLabel from "@material-ui/core/InputLabel";
+import {PersonAdd} from "@material-ui/icons";
 
 
 const useStyles = makeStyles(theme => ({
@@ -47,14 +51,30 @@ const useStyles = makeStyles(theme => ({
 export default function SignIn(props) {
   const classes = useStyles();
   const [user, setUser] = React.useState({
-    username : "",
-    password : "",
-    name  : ""
-  })
+    username: "",
+    password: "",
+    name: "",
+    role : ""
+  });
 
+  const [userRoles, setRoles] = React.useState([]);
+  if ( userRoles !== undefined && userRoles.length === 0) listRoles((a) => onChange(a));
+  if (userRoles === [] || userRoles === undefined) {
+    return blank();
+  } else {
+    return generatePage()
+  }
+
+  function onChange(userRoles) {
+    setRoles(userRoles);
+  }
+
+  function blank() {
+    return (<div/>)
+  }
 
   function handleInputChange(event) {
-    const {name,value} = event.target;
+    const {name, value} = event.target;
     setUser({...user, [name]: value})
   }
 
@@ -65,21 +85,25 @@ export default function SignIn(props) {
     axios.defaults.headers.common['Authorization'] = token;
     let url = "http://112.78.4.119:8080/login/addUser";
     axios.post(url, {
-      username : user.username,
-      password : user.password,
-      name : user.name
+      username: user.username,
+      password: user.password,
+      name: user.name,
+      role : user.role
     }).then(r => {
       if (r.status == 200) {
         alert("OK");
         setUser({
           username: "",
-          password : "",
-          name : ""
+          password: "",
+          name: "",
+          role: -1
         });
-      } else {
+      } else if (r.status == 400){
+        alert("Username existed");
+      }else {
         alert("Fail");
       }
-    }).catch(e =>{
+    }).catch(e => {
       alert("Fail");
       console.log(e);
     });
@@ -88,71 +112,82 @@ export default function SignIn(props) {
   }
 
 
-  return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Add User
-        </Typography>
-        <div className={classes.form} noValidate>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="username"
-            label="User Name"
-            name="username"
-            autoComplete="email"
-            value = {user.username}
-            onChange={(event)=>handleInputChange(event)}
-            autoFocus
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            value = {user.password}
-            onChange={(event)=>handleInputChange(event)}
+  function generatePage() {
+    return (
+      <Container component="main" maxWidth="xs">
+        <CssBaseline/>
+        <div className={classes.paper}>
+          <Avatar className={classes.avatar}>
+            <PersonAdd/>
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Add User
+          </Typography>
+          <div className={classes.form} noValidate>
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              id="username"
+              label="User Name"
+              name="username"
+              autoComplete="email"
+              value={user.username}
+              onChange={(event) => handleInputChange(event)}
+              autoFocus
+            />
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              value={user.password}
+              onChange={(event) => handleInputChange(event)}
 
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="name"
-            label="Name"
-            type="name"
-            id="name"
-            autoComplete="name"
-            value = {user.name}
-            onChange={(event)=>handleInputChange(event)}
+            />
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              name="name"
+              label="Name"
+              type="name"
+              id="name"
+              autoComplete="name"
+              value={user.name}
+              onChange={(event) => handleInputChange(event)}
 
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-            onClick={()=>addUser()}
-          >
-            Register
-          </Button>
+            />
+            <InputLabel>Role</InputLabel>
+            <Select name = "role"
+                    onChange={(event) => handleInputChange(event)}
+                    value = {user.role}
+                    label = "Role"
+                    fullWidth>
+              {userRoles.map(role =>(<MenuItem value = {role.id}> {role.name}</MenuItem>))}
+            </Select>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+              onClick={() => addUser()}
+            >
+              Register
+            </Button>
+          </div>
         </div>
-      </div>
-    </Container>
-  );
+      </Container>
+    );
+  }
+
 }
 
