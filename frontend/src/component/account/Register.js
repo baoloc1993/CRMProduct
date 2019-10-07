@@ -15,7 +15,7 @@ import Container from '@material-ui/core/Container';
 import Cookies from 'js-cookie'
 import axios from "axios";
 import {Redirect} from "react-router-dom";
-import Authentication, {authentication, getRole, listRoles} from "./Authentication";
+import Authentication, {authentication, getRole, listRoles} from "../Authentication";
 import NativeSelect from "@material-ui/core/NativeSelect";
 import {Select} from "@material-ui/core";
 import MenuItem from "@material-ui/core/MenuItem";
