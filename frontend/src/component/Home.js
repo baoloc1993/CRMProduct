@@ -74,6 +74,13 @@ const pages = [
         icon: <PersonAdd/>,
         role : ['ADMIN']
     },
+
+    {
+        title: 'Change Role',
+        href: '/listUser',
+        icon: <PersonAdd/>,
+        role : ['ADMIN']
+    },
 ];
 
 
