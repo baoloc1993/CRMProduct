@@ -105,7 +105,7 @@ public class LoginController {
         user.setName(authenticationRequest.getName());
         user.setUsername(authenticationRequest.getUsername());
         user.setPassword(authenticationRequest.getPassword());
-        Role role = roleRepository.findById(Constant.ROLE_CUSTOMER).get();
+        Role role = roleRepository.findById(authenticationRequest.getRole()).get();
         user.setRole(role);
         userRepository.save(user);
         return ok().build();

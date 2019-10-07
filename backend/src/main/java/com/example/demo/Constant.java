@@ -8,6 +8,8 @@ public interface Constant {
   String STAFF = "STAFF";
   String ADMIN = "ADMIN";
   String MANAGER = "MANAGER";
+  String CUSTOMER = "CUSTOMER";
+  String GUEST = "GUEST";
 
 
   int ROLE_ADMIN = 1;
