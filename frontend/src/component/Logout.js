@@ -13,7 +13,7 @@ export const logout =  () => {
 
         if (r.status == 200) {
             Cookies.set('access_token', undefined);
-            return <Redirect to={"/login"}/>
+            window.location.href = "/login"
 
         } else {
             return <Redirect to={"/home"}/>

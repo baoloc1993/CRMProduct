@@ -113,7 +113,7 @@ export default function OrderDetail() {
                             Đơn ship
                         </Typography>
                         <React.Fragment>
-                            <ShipForm role={data.role} disable={false} data={data.order}/>
+                            <ShipForm role={data.role} disable={false} data={data.order} statuses = {data.statuses}/>
                         </React.Fragment>
                     </Paper>
                 </main>

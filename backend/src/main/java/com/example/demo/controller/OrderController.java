@@ -5,7 +5,9 @@ import static org.springframework.http.ResponseEntity.ok;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -111,6 +113,16 @@ public class OrderController {
                 return badRequest().build();
             }
             OrderRecord orderRecord = new OrderRecord();
+            String orderLink  = orderRequest.getOrderLink();
+            String param = orderLink.split("\\?")[1];
+            Map<String,String> paramMap  = new HashMap<>();
+            String [] params = param.split("&");
+            for (int i = 0 ; i < params.length; i++){
+                String p = params[i].split("=")[0];
+                String v = params[i].split("=")[1];
+                paramMap.put(p,v);
+            }
+            orderRecord.setId(paramMap.get("orderId"));
             addOrder(orderRequest, orderRecord, authorization);
             return ok().build();
         } catch (Exception e) {
@@ -135,8 +147,8 @@ public class OrderController {
             orderRecord.setAssignDateTime(assignDateTime);
             orderRecord.setManagerInCharge(manager);
             orderRecord.setPersonInCharge(staff);
-            OrderStatus orderStatus = statusRepository.findById(Constant.ASSIGNED).get();
-            orderRecord.setStatus(orderStatus);
+//            OrderStatus orderStatus = statusRepository.findById(Constant.ASSIGNED).get();
+//            orderRecord.setStatus(orderStatus);
             orderRepository.save(orderRecord);
             return ok(model);
         } catch (Exception e) {
@@ -148,12 +160,12 @@ public class OrderController {
     @RequestMapping(value = "/complete", method = RequestMethod.POST)
     public ResponseEntity completeOrder(Model model, @RequestBody CompleteOrderRequest completeOrderRequest) {
         try {
-            int orderId = completeOrderRequest.getOrderId();
+            String orderId = completeOrderRequest.getOrderId();
             OrderRecord orderRecord = orderRepository.findById(orderId).get();
             orderRecord.setId(orderId);
             orderRecord.setCompletedDateTime(LocalDateTime.now());
-            OrderStatus orderStatus = statusRepository.findById(Constant.COMPLETE).get();
-            orderRecord.setStatus(orderStatus);
+//            OrderStatus orderStatus = statusRepository.findById(Constant.COMPLETE).get();
+//            orderRecord.setStatus(orderStatus);
             orderRepository.save(orderRecord);
             return ok(model);
         } catch (Exception e) {
@@ -165,7 +177,7 @@ public class OrderController {
     @RequestMapping(value = "/perform", method = RequestMethod.POST)
     public ResponseEntity performOrder(Model model, @RequestBody CompleteOrderRequest completeOrderRequest) {
         try {
-            int orderId = completeOrderRequest.getOrderId();
+            String orderId = completeOrderRequest.getOrderId();
             OrderRecord orderRecord = orderRepository.findById(orderId).get();
             orderRecord.setPicDateTime(LocalDateTime.now());
             OrderStatus orderStatus = statusRepository.findById(Constant.IN_PROGRESS).get();
@@ -184,14 +196,16 @@ public class OrderController {
         try {
             String userName = jwtTokenProvider.getUsername(authorization.substring(7));
             User user = userRepository.findUserByUsername(userName);
+            Iterable<OrderStatus> orderStatuses = statusRepository.findAll();
             OrderRecord orderRecord;
             if (user.getRole().getName().equals("ADMIN")) {
-                orderRecord = orderRepository.findById(Integer.parseInt(orderId)).get();
+                orderRecord = orderRepository.findById(orderId).get();
             } else {
-                orderRecord = orderRepository.findById(Integer.parseInt(orderId), user.getId()).get();
+                orderRecord = orderRepository.findById(orderId, user.getId()).get();
             }
             model.addAttribute("order", orderRecord);
             model.addAttribute("role", user.getRole().getName());
+            model.addAttribute("statuses",orderStatuses);
             return ok(model);
         } catch (Exception e) {
             logger.error(e.getMessage());

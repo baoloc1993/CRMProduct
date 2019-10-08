@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class OrderRequest {
-    int orderId;
+    String orderId;
     String orderLink;
     String trackingLink;
     String address;

@@ -6,6 +6,8 @@ import {makeStyles} from "@material-ui/core";
 import axios from "axios";
 import Cookies from "js-cookie";
 import {Route} from "react-router";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
 
 const useStyles = makeStyles(theme => ({
     appBar: {
@@ -35,6 +37,7 @@ const ShipForm = props => {
     let role = props.role;
     let disable = props.disable;
     let data = props.data;
+    let statuses = props.statuses;
     const [formData, setForm] = React.useState(data);
     let form = formData;
     if (form == undefined) {
@@ -261,7 +264,7 @@ const ShipForm = props => {
                         type="number"
                         id="number"
                         name="number"
-                        label="Number Order"
+                        label="Số Lượng"
                         fullWidth
                         autoComplete="number"
                         onChange={(event) => handleInputChange(event)}
@@ -275,7 +278,7 @@ const ShipForm = props => {
                         value={form.note}
                         id="note"
                         name="note"
-                        label="Note"
+                        label="Ghi chú"
                         fullWidth
                         autoComplete="note"
                         multiline
@@ -285,17 +288,19 @@ const ShipForm = props => {
                         }}/>
                 </Grid>
                 <Grid item xs={12} style={{display: checkRole(role, ["MANAGER", "ADMIN"])}}>
-                    <TextField
-                        id="status"
-                        name="status"
-                        label="Trạng thái đơn"
-                        fullWidth
-                        autoComplete="status"
-                        InputProps={{
-                            readOnly: true,
-                        }}
-                        onChange={(event) => handleInputChange(event)}
-                    />
+                    <Select value={form.status}
+                            onChange={(event) => handleInputChange(event)}
+                            name="status"
+                            id="status"
+                            label="Trạng thái đơn"
+                            InputProps={{
+                                readOnly: disable,
+                            }}>
+                        {statuses.map(status=>(
+                          <MenuItem value={status.id}/>
+                        ))}
+
+                    </Select>
                 </Grid>
                 <div className={classes.buttons} style={{display: disable ? 'none' : 'block'}}>
                     <Button variant="contained" color="primary"

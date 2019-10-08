@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class AssignOrderRequest {
-    int orderId;
+    String orderId;
     int staffId;
 }
