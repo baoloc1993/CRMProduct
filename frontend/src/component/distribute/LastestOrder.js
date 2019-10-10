@@ -1,7 +1,5 @@
 import React, {useState} from 'react';
 import clsx from 'clsx';
-import moment from 'moment';
-import PerfectScrollbar from 'react-perfect-scrollbar';
 import PropTypes from 'prop-types';
 import {makeStyles} from '@material-ui/styles';
 import {
@@ -19,12 +17,14 @@ import {
     Tooltip,
     TableSortLabel
 } from '@material-ui/core';
-import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import Cookies from "js-cookie";
 import axios from "axios";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
-import ScrollBar from "react-perfect-scrollbar";
+import ReactTable from 'react-table'
+import Moment from 'moment'
+import 'react-table/react-table.css'
+
 
 
 const useStyles = makeStyles(theme => ({
@@ -176,6 +176,8 @@ const LatestOrders = props => {
     }
 
     function generatePage() {
+
+
         return (
             <Card
                 className={clsx(classes.root)}
@@ -187,97 +189,16 @@ const LatestOrders = props => {
                 <CardContent className={classes.content}>
                     {/*<ScrollBar>*/}
                     {/*<div className={classes.inner}>*/}
-                    <Table stickyHeader={true}>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Order Ref</TableCell>
-                                <TableCell>Customer Name</TableCell>
-                                <TableCell>Order Link</TableCell>
-                                <TableCell>Tracking Link</TableCell>
-                                <TableCell>Ship Information</TableCell>
-                                <TableCell>Quantity</TableCell>
-                                <TableCell>USD Price</TableCell>
-                                <TableCell>Tax</TableCell>
-                                <TableCell>Total Price</TableCell>
-                                <TableCell>Rate</TableCell>
-                                <TableCell>VND Price</TableCell>
-                                <TableCell>Status</TableCell>
-                                <TableCell>Assign</TableCell>
-
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {data.order.map(order => (
-                                <TableRow
-                                    hover
-                                    key={order.id}
-                                >
-                                    <TableCell onClick={() => editOrderDetail(order.id)}>
-                                        <div style={{cursor: "pointer"}}>
-                                            {order.orderId}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell onClick={() => goToCustomer(order.customer.id)}>
-                                        <div style={{cursor: "pointer"}}>
-                                            {order.customer.name}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>{order.orderLink}</TableCell>
-                                    <TableCell>{order.trackingLink}</TableCell>
-                                    <TableCell>{order.address}</TableCell>
-                                    <TableCell>{order.number}</TableCell>
-                                    <TableCell>{order.usdPrice}</TableCell>
-                                    <TableCell>{order.tax}</TableCell>
-                                    <TableCell>
-                                        {/*<Button color="primary" size="small" variant="text"*/}
-                                        {/*        onClick={() => processOrder(order.id)}*/}
-                                        {/*        disabled={order.status.id >= 2}*/}
-                                        {/*>*/}
-                                        {/*    Process Order*/}
-                                        {/*</Button>*/}
-                                        {order.totalValueUsd}
-                                    </TableCell>
-                                    <TableCell>
-                                        {/*<Button color="primary" size="small" variant="text"*/}
-                                        {/*        onClick={() => completeOrder(order.id)}*/}
-                                        {/*        disabled={order.status.id >= 3}>*/}
-                                        {/*    Complete Order*/}
-                                        {/*</Button>*/}
-                                        {order.rate}
-                                    </TableCell>
-                                    <TableCell>
-                                        {/*<Button color="primary" size="small" variant="text"*/}
-                                        {/*        onClick={() => completeOrder(order.id)}*/}
-                                        {/*        disabled={order.status.id >= 3}>*/}
-                                        {/*    Complete Order*/}
-                                        {/*</Button>*/}
-                                        {order.totalValueVnd}
-                                    </TableCell>
-                                    <TableCell>
-                                        {/*<Button color="primary" size="small" variant="text"*/}
-                                        {/*        onClick={() => completeOrder(order.id)}*/}
-                                        {/*        disabled={order.status.id >= 3}>*/}
-                                        {/*    Complete Order*/}
-                                        {/*</Button>*/}
-                                        {order.status.name}
-                                    </TableCell>
-                                    <TableCell>
-                                        <Select
-                                            value={order.id.toString() + "-" + (order.personInCharge === null ? '' : order.personInCharge.id).toString()}
-                                            onChange={assignStaff}
-                                            readOnly={order.personInCharge !== null}
-                                        >
-                                            {data.staff.map(staff => (
-                                                <MenuItem
-                                                    value={order.id.toString() + "-" + staff.id.toString()}>{staff.username}</MenuItem>
-                                            ))}
-
-                                        </Select>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                    <ReactTable
+                    data={data.order}
+                    columns={columns}
+                    className="-striped -highlight"
+                    resolveData={data => data.map(row => row)}
+                    filterable
+                    defaultFilterMethod={(filter, row) =>
+                        String(row[filter.id]) === filter.value}
+                    contentEditable
+                    />
                     {/*</div>*/}
                     {/*</ScrollBar>*/}
                 </CardContent>
@@ -290,5 +211,92 @@ const LatestOrders = props => {
 LatestOrders.propTypes = {
     className: PropTypes.string
 };
+const columns = [{
+    id : "orderId",
+    Header: 'Order Ref',
+    accessor: 'orderId' // String-based value accessors!
+}, {
+    id : "customerName",
+    Header: 'Customer Name',
+    accessor: d => d.customer.name,
+    sortMethod: (a, b) => {
+        if (a === null && b === null) return  0;
+        if (a === null) return  -1;
+        if (b === null ) return 1;
+        if (a.length === b.length) {
+            return a > b ? 1 : -1;
+        }
+        return a.length > b.length ? 1 : -1;
+    }
+}, {
+    id : "orderLink",
+    Header: 'Order Link',
+    accessor:'orderLink'
+}, {
+    id : "trackingLink",
+    Header: 'Track Link',
+    accessor:'trackingLink'
+}, {
+    id : "shipInformation",
+    Header: 'Ship Information',
+    accessor:'address'
+}, {
+    id : "quantity",
+    Header: 'Quantity',
+    accessor:'number'
+}, {
+    id : "usdPrice",
+    Header: 'USD Price',
+    accessor: d=> d.usdPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+}, {
+    id : "tax",
+    Header: 'Tax',
+    accessor:'tax'
+}, {
+    id : "totalUsd",
+    Header: 'Total Price',
+    accessor:d=> d.totalValueUsd.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+}, {
+    id : "rate",
+    Header: 'Rate',
+    accessor:d=> d.rate.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+}, {
+    id : "totalVnd",
+    Header: 'VND Price',
+    accessor: d=> d.totalValueVnd.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+}, {
+    id : "status",
+    Header: 'Status',
+    accessor:d=>d.status.name
+}, {
+    id : "assign",
+    Header: 'Assign',
+    accessor:d=>d.personInCharge === null ? "" : d.personInCharge.username
+}, {
+    id : "date",
+    Header: 'Order Date Time',
+    accessor:d=>{
+        return Moment(d.orderDateTime)
+            .local()
+            .format("DD-MM-YYYY hh:mm:ss a")
+    }
+}]
 
+function renderEditable(cellInfo) {
+    return (
+        <div
+            style={{ backgroundColor: "#fafafa" }}
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={e => {
+                const data = [...this.state.data];
+                data[cellInfo.index][cellInfo.column.id] = e.target.innerHTML;
+                this.setState({ data });
+            }}
+            dangerouslySetInnerHTML={{
+                __html: this.state.data[cellInfo.index][cellInfo.column.id]
+            }}
+        />
+    );
+}
 export default LatestOrders;

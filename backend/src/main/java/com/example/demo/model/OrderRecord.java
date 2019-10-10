@@ -20,7 +20,9 @@ import lombok.NoArgsConstructor;
 public class OrderRecord {
 
   @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE)
   String id;
+  String orderId;
 
   String orderLink;
   String trackingLink;
