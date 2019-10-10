@@ -52,7 +52,10 @@ const ShipForm = props => {
             totalValueVnd: 0,
             note: "",
             number: 0,
-            status: "",
+            status: {
+                id: -1,
+                name : ""
+            },
             customerName: ""
         };
     }
@@ -61,21 +64,21 @@ const ShipForm = props => {
     const classes = useStyles();
     function handleConfirm(){
         let url = window.location.href;
-        let orderID = url.split("=")[1];
-        if (orderID !== undefined){
-            handleUpdate(orderID);
+        let id = url.split("=")[1];
+        if (id !== undefined){
+            handleUpdate(id);
         }else{
             handleSubmit();
         }
     }
 
-    function handleUpdate(orderID) {
+    function handleUpdate(id) {
         let token = Cookies.get('access_token');
         token = ("Bearer " + token);
 
         axios.defaults.headers.common['Authorization'] = token;
         axios.post("http://112.78.4.119:8080/order/update", {
-            orderId: orderID,
+            id: id,
             orderLink: form.orderLink,
             trackingLink: form.trackingLink,
             address: form.address,
@@ -148,7 +151,7 @@ const ShipForm = props => {
                         fullWidth
                         autoComplete="order"
                         onChange={(event) => handleInputChange(event)}
-                        InputProps={{
+                        inputprops={{
                             readOnly: disable,
                         }}
                     />
@@ -163,7 +166,7 @@ const ShipForm = props => {
                         fullWidth
                         autoComplete="tracking"
                         onChange={(event) => handleInputChange(event)}
-                        InputProps={{
+                        inputprops={{
                             readOnly: disable,
                         }}
                     />
@@ -174,11 +177,11 @@ const ShipForm = props => {
                         value={form.address}
                         id="address"
                         name="address"
-                        label="Địa chỉ"
+                        label="Thông tin ship"
                         fullWidth
                         autoComplete="address"
                         onChange={(event) => handleInputChange(event)}
-                        InputProps={{
+                        inputprops={{
                             readOnly: disable,
                         }}
                     />
@@ -194,7 +197,7 @@ const ShipForm = props => {
                         fullWidth
                         autoComplete="usdPrice"
                         onChange={(event) => handleInputChange(event)}
-                        InputProps={{
+                        inputprops={{
                             readOnly: disable,
                         }}
                     />
@@ -209,7 +212,7 @@ const ShipForm = props => {
                         fullWidth
                         autoComplete="tax"
                         onChange={(event) => handleInputChange(event)}
-                        InputProps={{
+                        inputprops={{
                             readOnly: disable,
                         }}
                     />
@@ -223,7 +226,7 @@ const ShipForm = props => {
                         label="Tổng giá trị đơn (USD)"
                         fullWidth
                         autoComplete="totalValueUSD"
-                        InputProps={{
+                        inputprops={{
                             readOnly: disable,
                         }}
 
@@ -239,7 +242,7 @@ const ShipForm = props => {
                         fullWidth
                         autoComplete="rate"
                         onChange={(event) => handleInputChange(event)}
-                        InputProps={{
+                        inputprops={{
                             readOnly: disable,
                         }}
                     />
@@ -253,7 +256,7 @@ const ShipForm = props => {
                         label="Tổng giá trị đơn (VND)"
                         fullWidth
                         autoComplete="totalValueVND"
-                        InputProps={{
+                        inputprops={{
                             readOnly: disable,
                         }}
                     />
@@ -268,9 +271,8 @@ const ShipForm = props => {
                         fullWidth
                         autoComplete="number"
                         onChange={(event) => handleInputChange(event)}
-                        InputProps={{
+                        inputprops={{
                             readOnly: disable,
-                            shrink: true,
                         }}/>
                 </Grid>
                 <Grid item xs={12} sm={12} style={{display: checkRole(role, ["CUSTOMER", "MANAGER", "ADMIN"])}}>
@@ -283,21 +285,21 @@ const ShipForm = props => {
                         autoComplete="note"
                         multiline
                         onChange={(event) => handleInputChange(event)}
-                        InputProps={{
+                        inputprops={{
                             readOnly: disable,
                         }}/>
                 </Grid>
                 <Grid item xs={12} style={{display: checkRole(role, ["MANAGER", "ADMIN"])}}>
-                    <Select value={form.status}
+                    <Select value={form.status.id}
                             onChange={(event) => handleInputChange(event)}
                             name="status"
                             id="status"
                             label="Trạng thái đơn"
-                            InputProps={{
+                            inputprops={{
                                 readOnly: disable,
                             }}>
                         {statuses.map(status=>(
-                          <MenuItem value={status.id}/>
+                            <MenuItem value={status.id}>{status.name}</MenuItem>
                         ))}
 
                     </Select>

@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class OrderRequest {
+    String id;
     String orderId;
     String orderLink;
     String trackingLink;
@@ -15,5 +16,4 @@ public class OrderRequest {
     float totalValueVnd;
     String note;
     int number;
-    String customerName;
 }

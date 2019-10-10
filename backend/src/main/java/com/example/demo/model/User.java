@@ -1,12 +1,11 @@
 package com.example.demo.model;
 
+import com.example.demo.Constant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -26,5 +25,9 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     Role role;
+
+    public String getPassword(){
+        return Constant.SALT_PREV + password + Constant.SALT_POST;
+    }
 
 }

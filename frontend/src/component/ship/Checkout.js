@@ -128,7 +128,7 @@ export default function Checkout(props) {
                 </React.Fragment>
               ) : (
                 <React.Fragment>
-                  <ShipForm role = {userRole} disable = {disable} data = {undefined}/>
+                  <ShipForm role = {userRole} disable = {disable} data = {undefined} statuses = {[]}/>
                 </React.Fragment>
               )}
             </React.Fragment>

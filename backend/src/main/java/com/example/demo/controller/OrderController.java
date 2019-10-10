@@ -70,8 +70,8 @@ public class OrderController {
                 return badRequest().build();
             }
             OrderRecord orderRecord = new OrderRecord();
-            orderRecord.setId(orderRequest.getOrderId());
-            addOrder(orderRequest, orderRecord, authorization);
+            orderRecord.setId(orderRequest.getId());
+            addOrder(orderRequest, orderRecord,authorization);
             return ok().build();
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -80,8 +80,7 @@ public class OrderController {
         }
     }
 
-    private void addOrder(@RequestBody OrderRequest orderRequest,
-                          OrderRecord orderRecord, String authorization) {
+    private void addOrder(OrderRequest orderRequest,OrderRecord orderRecord,String authorization) {
         String userName = jwtTokenProvider.getUsername(authorization.substring(7));
         LocalDateTime registerDateTime = LocalDateTime.now();
         User user = userRepository.findUserByUsername(userName);
@@ -100,6 +99,17 @@ public class OrderController {
         orderRecord.setTotalValueVnd(totalValueUsd * orderRequest.getRate());
         OrderStatus orderStatus = statusRepository.findById(Constant.NEW).get();
         orderRecord.setStatus(orderStatus);
+        orderRecord.setTrackingLink(orderRequest.getTrackingLink());
+        String trackLink  = orderRequest.getTrackingLink();
+        String param = trackLink.split("\\?")[1];
+        Map<String,String> paramMap  = new HashMap<>();
+        String [] params = param.split("&");
+        for (int i = 0 ; i < params.length; i++){
+            String p = params[i].split("=")[0];
+            String v = params[i].split("=")[1];
+            paramMap.put(p,v);
+        }
+        orderRecord.setOrderId(paramMap.get("orderId"));
         orderRepository.save(orderRecord);
     }
 
@@ -112,18 +122,8 @@ public class OrderController {
                     || orderRequest.getUsdPrice() <= 0) {
                 return badRequest().build();
             }
-            OrderRecord orderRecord = new OrderRecord();
-            String orderLink  = orderRequest.getOrderLink();
-            String param = orderLink.split("\\?")[1];
-            Map<String,String> paramMap  = new HashMap<>();
-            String [] params = param.split("&");
-            for (int i = 0 ; i < params.length; i++){
-                String p = params[i].split("=")[0];
-                String v = params[i].split("=")[1];
-                paramMap.put(p,v);
-            }
-            orderRecord.setId(paramMap.get("orderId"));
-            addOrder(orderRequest, orderRecord, authorization);
+
+            addOrder(orderRequest,new OrderRecord(), authorization);
             return ok().build();
         } catch (Exception e) {
             logger.error(e.getMessage());

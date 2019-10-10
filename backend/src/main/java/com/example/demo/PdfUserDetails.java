@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import com.example.demo.model.User;
+import com.example.demo.model.UserSecure;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,11 +11,11 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class PdfUserDetails implements UserDetails {
-    private User user;
+    private UserSecure user;
 
     private static final String PREFIX_ROLE = "ROLE_";
 
-    public PdfUserDetails(User user) {
+    public PdfUserDetails(UserSecure user) {
         this.user = user;
     }
     @Override
@@ -53,7 +54,7 @@ public class PdfUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-    public User getUserDetails() {
+    public UserSecure getUserDetails() {
         return user;
     }
 }

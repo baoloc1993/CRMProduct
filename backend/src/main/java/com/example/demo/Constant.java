@@ -27,4 +27,7 @@ public interface Constant {
 
 
   int MAX_TOKEN_LENGTH = 100;
+
+  String SALT_PREV = "zYBwYv92W46wmYPlEVMY";
+  String SALT_POST = "OTYG3kBKJOU1FIYBjYoG";
 }
