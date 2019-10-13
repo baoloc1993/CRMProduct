@@ -26,7 +26,6 @@ import Moment from 'moment'
 import 'react-table/react-table.css'
 
 
-
 const useStyles = makeStyles(theme => ({
     root: {},
     content: {
@@ -190,14 +189,14 @@ const LatestOrders = props => {
                     {/*<ScrollBar>*/}
                     {/*<div className={classes.inner}>*/}
                     <ReactTable
-                    data={data.order}
-                    columns={columns}
-                    className="-striped -highlight"
-                    resolveData={data => data.map(row => row)}
-                    filterable
-                    defaultFilterMethod={(filter, row) =>
-                        String(row[filter.id]) === filter.value}
-                    contentEditable
+                        data={data.order}
+                        columns={columns}
+                        className="-striped -highlight"
+                        resolveData={data => data.map(row => row)}
+                        filterable
+                        defaultFilterMethod={(filter, row) =>
+                            String(row[filter.id]) === filter.value}
+                        contentEditable
                     />
                     {/*</div>*/}
                     {/*</ScrollBar>*/}
@@ -212,70 +211,73 @@ LatestOrders.propTypes = {
     className: PropTypes.string
 };
 const columns = [{
-    id : "orderId",
+    id: "orderId",
     Header: 'Order Ref',
     accessor: 'orderId' // String-based value accessors!
 }, {
-    id : "customerName",
+    id: "customerName",
     Header: 'Customer Name',
     accessor: d => d.customer.name,
     sortMethod: (a, b) => {
-        if (a === null && b === null) return  0;
-        if (a === null) return  -1;
-        if (b === null ) return 1;
+        if (a === null && b === null) return 0;
+        if (a === null) return -1;
+        if (b === null) return 1;
         if (a.length === b.length) {
             return a > b ? 1 : -1;
         }
         return a.length > b.length ? 1 : -1;
-    }
+    },
+    // Cell : renderEditable
+
 }, {
-    id : "orderLink",
+    id: "orderLink",
     Header: 'Order Link',
-    accessor:'orderLink'
+    accessor: 'orderLink'
 }, {
-    id : "trackingLink",
+    id: "trackingLink",
     Header: 'Track Link',
-    accessor:'trackingLink'
+    accessor: 'trackingLink'
 }, {
-    id : "shipInformation",
+    id: "shipInformation",
     Header: 'Ship Information',
-    accessor:'address'
+    accessor: 'address'
 }, {
-    id : "quantity",
+    id: "quantity",
     Header: 'Quantity',
-    accessor:'number'
+    accessor: 'number'
 }, {
-    id : "usdPrice",
+    id: "usdPrice",
     Header: 'USD Price',
-    accessor: d=> d.usdPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    accessor: d => d.usdPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }, {
-    id : "tax",
+    id: "tax",
     Header: 'Tax',
-    accessor:'tax'
+    accessor: 'tax'
 }, {
-    id : "totalUsd",
+    id: "totalUsd",
     Header: 'Total Price',
-    accessor:d=> d.totalValueUsd.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    accessor: d => d.totalValueUsd.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }, {
-    id : "rate",
+    id: "rate",
     Header: 'Rate',
-    accessor:d=> d.rate.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    accessor: d => d.rate.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }, {
-    id : "totalVnd",
+    id: "totalVnd",
     Header: 'VND Price',
-    accessor: d=> d.totalValueVnd.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    accessor: d => d.totalValueVnd.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }, {
-    id : "status",
+    id: "status",
     Header: 'Status',
-    accessor:d=>d.status.name
+    accessor: d => d.status.name
 }, {
-    id : "assign",
+    id: "assign",
     Header: 'Assign',
-    accessor:d=>d.personInCharge === null ? "" : d.personInCharge.username
+    accessor: d => d.personInCharge === null ? "" : d.personInCharge.username
 }, {
-    id : "date",
+    id: "date",
     Header: 'Order Date Time',
-    accessor:d=>{
+    accessor: d => {
+        d.orderDateTime[1]  = d.orderDateTime[1] -1;
         return Moment(d.orderDateTime)
             .local()
             .format("DD-MM-YYYY hh:mm:ss a")
@@ -285,18 +287,19 @@ const columns = [{
 function renderEditable(cellInfo) {
     return (
         <div
-            style={{ backgroundColor: "#fafafa" }}
+            style={{backgroundColor: "#fafafa"}}
             contentEditable
             suppressContentEditableWarning
             onBlur={e => {
-                const data = [...this.state.data];
+                const data = this.getData();
                 data[cellInfo.index][cellInfo.column.id] = e.target.innerHTML;
-                this.setState({ data });
+                this.setData(data);
             }}
             dangerouslySetInnerHTML={{
-                __html: this.state.data[cellInfo.index][cellInfo.column.id]
+                // __html: this.getData()[cellInfo.index][cellInfo.column.id]
             }}
         />
     );
 }
+
 export default LatestOrders;

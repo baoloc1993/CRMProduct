@@ -16,6 +16,8 @@ import EditOrder from "./component/order/EditOrder";
 import {logout} from "./component/Logout";
 import Register from "./component/account/Register";
 import ListUser from "./component/account/ListUser";
+import DailyReport from "./component/report/DailyReport";
+import Payment from "./component/report/Payment";
 
 
 function App() {
@@ -34,6 +36,8 @@ function App() {
           <Route path='/logout' component={logout}/>
           <Route path='/addUser' component={Register}/>
           <Route path='/listUser' component={ListUser}/>
+          <Route path='/report' component={DailyReport}/>
+          <Route path='/makePayment' component={Payment}/>
         </Switch>
       </Router>
     </ThemeProvider>
