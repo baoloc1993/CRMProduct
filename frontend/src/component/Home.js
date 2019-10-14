@@ -3,7 +3,7 @@ import {NavLink as RouterLink} from 'react-router-dom';
 import clsx from 'clsx';
 import {makeStyles} from '@material-ui/styles';
 import {List, ListItem, Button, colors} from '@material-ui/core';
-import {ArrowBack, ImportExport, PersonAdd, Receipt, Report, Shop, ShoppingCart} from "@material-ui/icons";
+import {ArrowBack, ImportExport, Payment, PersonAdd, Receipt, Report, Shop, ShoppingCart} from "@material-ui/icons";
 import {authentication, getRole} from "./Authentication";
 import ImportData from "./data/ImportData";
 
@@ -87,6 +87,13 @@ const pages = [
         title: 'Report',
         href: '/report',
         icon: <Receipt/>,
+        role : ['ADMIN']
+    },
+
+    {
+        title: 'Make Payment',
+        href: '/makePayment',
+        icon: <Payment/>,
         role : ['ADMIN']
     },
     {

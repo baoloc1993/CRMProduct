@@ -239,7 +239,7 @@ const transactionColumn = [
   }, {
     id: "customerName",
     Header: 'Customer Name',
-    accessor: 'username',
+    accessor: d=>d.customer.name,
     sortMethod: (a, b) => {
       if (a === null && b === null) return 0;
       if (a === null) return -1;

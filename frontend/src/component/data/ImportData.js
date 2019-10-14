@@ -5,19 +5,12 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-
-import {authentication, getRole} from "../Authentication";
-import Redirect from "react-router-dom/es/Redirect";
-import ShipForm from "../ship/ShipForm";
 import Cookies from "js-cookie";
 import axios from "axios";
-import queryString from 'query-string';
 import Grid from "@material-ui/core/Grid";
-import TextField from "@material-ui/core/TextField";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import Button from "@material-ui/core/Button";
-import {InputLabel} from "@material-ui/core";
 import ReactFileReader from 'react-file-reader';
 import DatePicker from "react-datepicker";
 
