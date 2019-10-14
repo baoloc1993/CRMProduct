@@ -25,6 +25,10 @@ public interface Constant {
   int IN_PROGRESS = 2;
   int COMPLETE =3;
 
+  int ORDERED = 1;
+  int CANCELLED = 2;
+  int RETURNED =3;
+
 
   int MAX_TOKEN_LENGTH = 100;
 

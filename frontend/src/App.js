@@ -18,6 +18,7 @@ import Register from "./component/account/Register";
 import ListUser from "./component/account/ListUser";
 import DailyReport from "./component/report/DailyReport";
 import Payment from "./component/report/Payment";
+import ImportData from "./component/data/ImportData";
 
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
           <Route path='/listUser' component={ListUser}/>
           <Route path='/report' component={DailyReport}/>
           <Route path='/makePayment' component={Payment}/>
+          <Route path='/importData' component={ImportData}/>
         </Switch>
       </Router>
     </ThemeProvider>

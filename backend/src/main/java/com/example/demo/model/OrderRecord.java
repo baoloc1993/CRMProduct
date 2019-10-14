@@ -21,7 +21,7 @@ public class OrderRecord {
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE)
-  String id;
+  int id;
   String orderId;
 
   String orderLink;

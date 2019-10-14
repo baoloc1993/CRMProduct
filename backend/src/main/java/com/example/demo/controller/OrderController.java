@@ -160,7 +160,7 @@ public class OrderController {
     @RequestMapping(value = "/complete", method = RequestMethod.POST)
     public ResponseEntity completeOrder(Model model, @RequestBody CompleteOrderRequest completeOrderRequest) {
         try {
-            String orderId = completeOrderRequest.getOrderId();
+            int orderId = completeOrderRequest.getOrderId();
             OrderRecord orderRecord = orderRepository.findById(orderId).get();
             orderRecord.setId(orderId);
             orderRecord.setCompletedDateTime(LocalDateTime.now());
@@ -177,7 +177,7 @@ public class OrderController {
     @RequestMapping(value = "/perform", method = RequestMethod.POST)
     public ResponseEntity performOrder(Model model, @RequestBody CompleteOrderRequest completeOrderRequest) {
         try {
-            String orderId = completeOrderRequest.getOrderId();
+            int orderId = completeOrderRequest.getOrderId();
             OrderRecord orderRecord = orderRepository.findById(orderId).get();
             orderRecord.setPicDateTime(LocalDateTime.now());
             OrderStatus orderStatus = statusRepository.findById(Constant.IN_PROGRESS).get();
@@ -191,7 +191,7 @@ public class OrderController {
     }
 
     @RequestMapping(value = "/get", method = RequestMethod.GET)
-    public ResponseEntity getOrder(Model model, @RequestParam String orderId,
+    public ResponseEntity getOrder(Model model, @RequestParam int orderId,
                                    @RequestHeader("Authorization") String authorization) {
         try {
             String userName = jwtTokenProvider.getUsername(authorization.substring(7));

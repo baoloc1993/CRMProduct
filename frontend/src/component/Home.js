@@ -3,8 +3,9 @@ import {NavLink as RouterLink} from 'react-router-dom';
 import clsx from 'clsx';
 import {makeStyles} from '@material-ui/styles';
 import {List, ListItem, Button, colors} from '@material-ui/core';
-import {ArrowBack, PersonAdd, Shop, ShoppingCart} from "@material-ui/icons";
+import {ArrowBack, ImportExport, PersonAdd, Receipt, Report, Shop, ShoppingCart} from "@material-ui/icons";
 import {authentication, getRole} from "./Authentication";
+import ImportData from "./data/ImportData";
 
 
 const useStyles = makeStyles(theme => ({
@@ -81,6 +82,19 @@ const pages = [
         icon: <PersonAdd/>,
         role : ['ADMIN']
     },
+
+    {
+        title: 'Report',
+        href: '/report',
+        icon: <Receipt/>,
+        role : ['ADMIN']
+    },
+    {
+        title: 'Import Data',
+        href: '/importData',
+        icon: <ImportExport/>,
+        role : ['ADMIN']
+    }
 ];
 
 
