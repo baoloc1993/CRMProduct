@@ -24,6 +24,9 @@ import java.util.stream.Collectors;
 import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.ok;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 @RestController
 @CrossOrigin
 @RequestMapping("/report")
@@ -40,23 +43,30 @@ public class ReportController {
     UserRepository userRepository;
 
     @RequestMapping(value = "/getReport", method = RequestMethod.GET)
-    public ResponseEntity createOrder(Model model, @RequestParam String dateStr) {
+    public ResponseEntity createOrder(Model model, @RequestParam String startDateStr, @RequestParam String endDateStr) {
         try {
-            Date date1 = new SimpleDateFormat("MM/dd/yyyy").parse(dateStr);
+            Date startDate = new SimpleDateFormat("yyyy/MM/dd").parse(startDateStr);
+            Date endDate = new SimpleDateFormat("yyyy/MM/dd").parse(endDateStr);
 
-            LocalDateTime startDateTime = LocalDate.from(date1.toInstant().atZone(ZoneId.systemDefault())
+            LocalDateTime startDateTime = LocalDate.from(startDate.toInstant().atZone(ZoneId.systemDefault())
                     .toLocalDate()).atStartOfDay();
-            LocalDateTime endDateTime = LocalDate.from(date1.toInstant().atZone(ZoneId.systemDefault())
+            LocalDateTime endDateTime = LocalDate.from(endDate.toInstant().atZone(ZoneId.systemDefault())
                     .toLocalDate().plusDays(1)).atStartOfDay();
             List<Optional<OrderRecord>> optionals = orderRepository.findListByDate(startDateTime, endDateTime);
             List<OrderRecord> orderRecords = optionals.stream().map(Optional::get).collect(Collectors.toList());
             List<Transaction> transactions = transactionRepository.findListByDate(startDateTime,endDateTime)
                     .stream().map(Optional::get).collect(Collectors.toList());
 
+            ArrayList<Money> moneyInResult =  new ArrayList<>();
+            ArrayList<Money> moneyOutResult =  new ArrayList<>();
+            ArrayList<Money> balanceResult =  new ArrayList<>();
             HashMap<Integer, Long> moneyIn =  new HashMap<>();
             HashMap<Integer, Long> moneyOut =  new HashMap<>();
+            HashMap<Integer, Long> balance =  new HashMap<>();
+            HashSet<Integer> listUser = new HashSet<>();
             orderRecords.forEach(record ->{
                 int userId = record.getCustomer().getId();
+                listUser.add(userId);
                 if (moneyOut.get(userId) != null){
                     long totalValueVnd = (long) record.getTotalValueVnd() + moneyOut.get(userId);
                     moneyOut.put(userId,totalValueVnd);
@@ -64,9 +74,14 @@ public class ReportController {
                     moneyOut.put(userId, (long) record.getTotalValueVnd());
                 }
             });
+            for (int i : moneyOut.keySet()){
+                User user = userRepository.findById(i).get();
+                moneyOutResult.add( new Money(i, user.getName(), moneyOut.get(i)));
+            }
 
             transactions.forEach(transaction -> {
                 int userId = transaction.getCustomer().getId();
+                listUser.add(userId);
                 if (moneyIn.get(userId) != null){
                     long totalPayAmountVnd = (long) transaction.getPayAmountVnd() + moneyIn.get(userId);
                     moneyIn.put(userId,totalPayAmountVnd);
@@ -74,9 +89,20 @@ public class ReportController {
                     moneyIn.put(userId, (long) transaction.getPayAmountVnd());
                 }
             });
+            for (int i : moneyIn.keySet()){
+                User user = userRepository.findById(i).get();
+                moneyInResult.add( new Money(i, user.getName(), moneyIn.get(i)));
+            }
+            for (int i : listUser){
+                User user = userRepository.findById(i).get();
+                long moneyInL = moneyIn.containsKey(i) ? moneyIn.get(i) : 0;
+                long moneyOutL = moneyOut.containsKey(i) ? moneyOut.get(i) : 0;
+                balanceResult.add( new Money(i, user.getName(), moneyInL - moneyOutL));
+            }
             model.addAttribute("transactions", transactions);
-            model.addAttribute("moneyIn",moneyIn);
-            model.addAttribute("moneyOut", moneyOut);
+            model.addAttribute("moneyIn",moneyInResult);
+            model.addAttribute("moneyOut", moneyOutResult);
+            model.addAttribute("balances", balanceResult);
             return ok(model);
 
         } catch (ParseException e) {
@@ -84,6 +110,13 @@ public class ReportController {
             return badRequest().build();
         }
 
+    }
+    @Data
+    @AllArgsConstructor
+    private class Money{
+        int userId;
+        String name;
+        long paymentAmount;
     }
 
     @RequestMapping(value = "/getCustomers", method = RequestMethod.GET)
@@ -116,3 +149,4 @@ public class ReportController {
         return ok().build();
     }
 }
+

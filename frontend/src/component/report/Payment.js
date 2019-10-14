@@ -79,7 +79,6 @@ export default function Payment() {
         }).then(r => {
             if (r.status == 200) {
                 alert("SUCCESS");
-                window.location.href="/order";
             } else {
                 alert("FAIL");
 
