@@ -1,10 +1,11 @@
 import Cookies from 'js-cookie'
 import axios from "axios";
 
+export const URL_PREFIX = "http://http://112.78.4.119:8080/";
 export const authentication =  (url,callback) => {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
-    let URL = "http://112.78.4.119:8080/" + url;
+    let URL = URL_PREFIX + url;
     axios.defaults.headers.common['Authorization'] = token;
     axios.post(URL, {
     }).then(r => {
@@ -24,7 +25,7 @@ export const authentication =  (url,callback) => {
 export const getRole =  (callback) => {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
-    let URL = "http://112.78.4.119:8080/getRole";
+    let URL = URL_PREFIX + "getRole";
     axios.defaults.headers.common['Authorization'] = token;
     axios.post(URL, {
     }).then(r => {
@@ -43,7 +44,7 @@ export const getRole =  (callback) => {
 export const listRoles =  (callback) => {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
-    let URL = "http://112.78.4.119:8080/listRoles";
+    let URL = URL_PREFIX  + "listRoles";
     axios.get(URL, {
     }).then(r => {
         if (r.status == 200) {

@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -64,13 +65,17 @@ public class OrderController {
     public ResponseEntity updateOrder(Model model, @RequestBody OrderRequest orderRequest,
                                       @RequestHeader("Authorization") String authorization) {
         try {
-            if (StringUtils.isEmpty(orderRequest.getOrderLink())
-                    || StringUtils.isEmpty(orderRequest.getAddress())
-                    || orderRequest.getUsdPrice() <= 0) {
+            if (StringUtils.isEmpty(orderRequest.getTrackingLink())
+                    || StringUtils.isEmpty(orderRequest.getOrderLink())
+                    || orderRequest.getUsdPrice() <= 0
+                || orderRequest.getTax() < 0
+                || orderRequest.getRate() <= 0) {
                 return badRequest().build();
             }
             OrderRecord orderRecord = new OrderRecord();
             orderRecord.setId(orderRequest.getId());
+            OrderStatus orderStatus = statusRepository.findById(orderRequest.getStatus()).get();
+            orderRecord.setStatus(orderStatus);
             addOrder(orderRequest, orderRecord,authorization);
             return ok().build();
         } catch (Exception e) {
@@ -94,22 +99,26 @@ public class OrderController {
         orderRecord.setUsdPrice(orderRequest.getUsdPrice());
         orderRecord.setRate(orderRequest.getRate());
         orderRecord.setTax(orderRequest.getTax());
-        float totalValueUsd = orderRequest.getUsdPrice() * (1 + orderRequest.getTax());
+        float totalValueUsd = orderRequest.getUsdPrice() * (1 + orderRequest.getTax()/100);
         orderRecord.setTotalValueUsd(totalValueUsd);
         orderRecord.setTotalValueVnd(totalValueUsd * orderRequest.getRate());
-        OrderStatus orderStatus = statusRepository.findById(Constant.NEW).get();
-        orderRecord.setStatus(orderStatus);
+
         orderRecord.setTrackingLink(orderRequest.getTrackingLink());
         String trackLink  = orderRequest.getTrackingLink();
-        String param = trackLink.split("\\?")[1];
-        Map<String,String> paramMap  = new HashMap<>();
-        String [] params = param.split("&");
-        for (int i = 0 ; i < params.length; i++){
+        if (!StringUtils.isEmpty(trackLink)){
+          String param = trackLink.split("\\?")[1];
+          Map<String,String> paramMap  = new HashMap<>();
+          String [] params = param.split("&");
+          for (int i = 0 ; i < params.length; i++){
             String p = params[i].split("=")[0];
             String v = params[i].split("=")[1];
             paramMap.put(p,v);
+          }
+          orderRecord.setOrderId(paramMap.get("orderId"));
+        }else{
+          orderRecord.setOrderId("");
         }
-        orderRecord.setOrderId(paramMap.get("orderId"));
+
         orderRepository.save(orderRecord);
     }
 
@@ -117,12 +126,16 @@ public class OrderController {
     public ResponseEntity createOrder(Model model, @RequestBody OrderRequest orderRequest,
                                       @RequestHeader("Authorization") String authorization) {
         try {
-            if (StringUtils.isEmpty(orderRequest.getOrderLink())
-                    || StringUtils.isEmpty(orderRequest.getAddress())
-                    || orderRequest.getUsdPrice() <= 0) {
+            if (StringUtils.isEmpty(orderRequest.getTrackingLink())
+                || StringUtils.isEmpty(orderRequest.getOrderLink())
+                || orderRequest.getUsdPrice() <= 0
+                || orderRequest.getTax() < 0
+                || orderRequest.getRate() <= 0) {
                 return badRequest().build();
             }
-
+            OrderRecord orderRecord = new OrderRecord();
+            OrderStatus orderStatus = statusRepository.findById(Constant.NEW).get();
+            orderRecord.setStatus(orderStatus);
             addOrder(orderRequest,new OrderRecord(), authorization);
             return ok().build();
         } catch (Exception e) {
@@ -275,8 +288,14 @@ public class OrderController {
                 listOrder = orderRepository.findList(user.getId()).stream().map(Optional::get).collect(Collectors.toList());
             }
 
+            List<OrderStatus> statuses = new ArrayList<>();
+            statusRepository.findAll().forEach(status -> {
+                statuses.add(status);
+            });
+
             model.addAttribute("order", listOrder);
             model.addAttribute("staff", staffs);
+            model.addAttribute("status", statuses);
             return ok(model);
         } catch (Exception e) {
             logger.error(e.getMessage());

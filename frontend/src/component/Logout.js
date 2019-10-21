@@ -2,11 +2,12 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import {Redirect} from "react-router";
 import React from "react";
+import {URL_PREFIX} from "./Authentication";
 
 export const logout =  () => {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
-    let URL = "http://112.78.4.119:8080/login/logout"
+    let URL = URL_PREFIX + "login/logout"
     axios.defaults.headers.common['Authorization'] = token;
     axios.post(URL, {
     }).then(r => {

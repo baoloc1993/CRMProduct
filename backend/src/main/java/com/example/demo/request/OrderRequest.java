@@ -16,4 +16,5 @@ public class OrderRequest {
     float totalValueVnd;
     String note;
     int number;
+    int status;
 }

@@ -6,7 +6,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 
-import {authentication, getRole} from "../Authentication";
+import {authentication, getRole, URL_PREFIX} from "../Authentication";
 import Redirect from "react-router-dom/es/Redirect";
 import ShipForm from "../ship/ShipForm";
 import Cookies from "js-cookie";
@@ -73,7 +73,7 @@ export default function Payment() {
         let token = Cookies.get('access_token');
         token = ("Bearer " + token);
         axios.defaults.headers.common['Authorization'] = token;
-        axios.post("http://112.78.4.119:8080/report/makePayment", {
+        axios.post(URL_PREFIX + "report/makePayment", {
             userId : form.userId,
             paymentAmount: parseInt(form.paymentAmount)
         }).then(r => {
@@ -88,7 +88,7 @@ export default function Payment() {
     function getData(callback) {
         let token = Cookies.get('access_token');
         token = ("Bearer " + token);
-        let URL = "http://112.78.4.119:8080/report/getCustomers";
+        let URL = URL_PREFIX + "report/getCustomers";
         axios.defaults.headers.common['Authorization'] = token;
         axios.get(URL, {}).then(r => {
             if (r.status == 200) {

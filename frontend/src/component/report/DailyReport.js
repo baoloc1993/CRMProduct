@@ -22,6 +22,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
+import {URL_PREFIX} from "../Authentication";
 
 
 const useStyles = makeStyles(theme => ({
@@ -66,7 +67,7 @@ const DailyReport = props => {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
     if (date === "") return;
-    let URL = "http://112.78.4.119:8080/report/getReport?startDateStr=" + startDate.toLocaleDateString() + "&endDateStr=" + endDate.toLocaleDateString();
+    let URL = URL_PREFIX + "report/getReport?startDateStr=" + startDate.toLocaleDateString() + "&endDateStr=" + endDate.toLocaleDateString();
     axios.defaults.headers.common['Authorization'] = token;
     axios.get(URL, {}).then(r => {
       if (r.status == 200) {

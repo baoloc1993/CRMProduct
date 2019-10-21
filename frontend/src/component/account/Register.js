@@ -15,7 +15,7 @@ import Container from '@material-ui/core/Container';
 import Cookies from 'js-cookie'
 import axios from "axios";
 import {Redirect} from "react-router-dom";
-import Authentication, {authentication, getRole, listRoles} from "../Authentication";
+import Authentication, {authentication, getRole, listRoles, URL_PREFIX} from "../Authentication";
 import NativeSelect from "@material-ui/core/NativeSelect";
 import {Select} from "@material-ui/core";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -83,7 +83,7 @@ export default function SignIn(props) {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
     axios.defaults.headers.common['Authorization'] = token;
-    let url = "http://112.78.4.119:8080/login/addUser";
+    let url = URL_PREFIX + "login/addUser";
     axios.post(url, {
       username: user.username,
       password: user.password,

@@ -6,7 +6,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 
-import {authentication, getRole} from "../Authentication";
+import {authentication, getRole, URL_PREFIX} from "../Authentication";
 import Redirect from "react-router-dom/es/Redirect";
 import ShipForm from "../ship/ShipForm";
 import Cookies from "js-cookie";
@@ -63,7 +63,7 @@ export default function OrderDetail() {
         let url = window.location.href;
         let orderID = url.split("=")[1];
 
-        let URL = "http://112.78.4.119:8080/order/get?orderId=" + orderID;
+        let URL = URL_PREFIX + "order/get?orderId=" + orderID;
         axios.defaults.headers.common['Authorization'] = token;
         axios.get(URL, {}).then(r => {
             if (r.status == 200) {

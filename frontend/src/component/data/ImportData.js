@@ -13,6 +13,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Button from "@material-ui/core/Button";
 import ReactFileReader from 'react-file-reader';
 import DatePicker from "react-datepicker";
+import {URL_PREFIX} from "../Authentication";
 
 const useStyles = makeStyles(theme => ({
   appBar: {
@@ -81,7 +82,7 @@ export default function ImportData() {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
     axios.defaults.headers.common['Authorization'] = token;
-    axios.post("http://112.78.4.119:8080/data/migrateData", {
+    axios.post(URL_PREFIX + "data/migrateData", {
       userId: form.userId,
       date: form.date,
       data : form.data
@@ -98,7 +99,7 @@ export default function ImportData() {
   function getData(callback) {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
-    let URL = "http://112.78.4.119:8080/data/getCustomers";
+    let URL = URL_PREFIX + "data/getCustomers";
     axios.defaults.headers.common['Authorization'] = token;
     axios.get(URL, {}).then(r => {
       if (r.status == 200) {

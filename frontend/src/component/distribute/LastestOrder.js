@@ -24,6 +24,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import ReactTable from 'react-table'
 import Moment from 'moment'
 import 'react-table/react-table.css'
+import {URL_PREFIX} from "../Authentication";
 
 
 const useStyles = makeStyles(theme => ({
@@ -78,31 +79,37 @@ const LatestOrders = props => {
   }, {
     id: "trackingLink",
     Header: 'Track Link',
-    accessor: 'trackingLink'
+    accessor: 'trackingLink',
+    Cell: (cellInfo) => renderEditable(cellInfo)
   }, {
-    id: "shipInformation",
+    id: "address",
     Header: 'Ship Information',
-    accessor: 'address'
+    accessor: 'address',
+    Cell: (cellInfo) => renderEditable(cellInfo)
   }, {
-    id: "quantity",
+    id: "number",
     Header: 'Quantity',
-    accessor: 'number'
+    accessor: 'number',
+    Cell: (cellInfo) => renderEditable(cellInfo)
   }, {
     id: "usdPrice",
     Header: 'USD Price',
-    accessor: d => d.usdPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    accessor: d => d.usdPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+    Cell: (cellInfo) => renderEditable(cellInfo)
   }, {
     id: "tax",
     Header: 'Tax',
-    accessor: 'tax'
+    accessor: 'tax',
+    Cell: (cellInfo) => renderEditable(cellInfo)
   }, {
     id: "totalUsd",
-    Header: 'Total Price',
+    Header: 'Total Price USD',
     accessor: d => d.totalValueUsd.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
   }, {
     id: "rate",
     Header: 'Rate',
-    accessor: d => d.rate.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    accessor: d => d.rate.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+    Cell: (cellInfo) => renderEditable(cellInfo)
   }, {
     id: "totalVnd",
     Header: 'VND Price',
@@ -110,7 +117,8 @@ const LatestOrders = props => {
   }, {
     id: "status",
     Header: 'Status',
-    accessor: d => d.status.name
+    accessor: d => d.status.name,
+    Cell: (cellInfo) => renderStatusEditable(cellInfo)
   }, {
     id: "assign",
     Header: 'Assign',
@@ -124,7 +132,7 @@ const LatestOrders = props => {
         .local()
         .format("DD-MM-YYYY hh:mm:ss a")
     }
-  }]
+  }];
 
   function renderEditable(cellInfo) {
     return (
@@ -135,9 +143,51 @@ const LatestOrders = props => {
         onBlur={e => {
           data.order[cellInfo.index][cellInfo.column.id] = e.target.innerHTML;
           setData(data);
+          saveOrder(cellInfo.row._original);
         }}
       >{data.order[cellInfo.index][cellInfo.column.id]}</div>
     );
+  }
+  function renderStatusEditable(cellInfo) {
+    console.log (data.order[cellInfo.row._index]);
+    return (
+      <div style={{backgroundColor: "#fafafa"}}
+        contentEditable
+        suppressContentEditableWarning>
+        <Select value={data.order[cellInfo.row._index].status.id}
+                onChange={(event) => handleInputChange(event,cellInfo.row._original)}>
+          {data.status.map(status=>(
+            <MenuItem value={status.id}>{status.name}</MenuItem>
+          ))}
+
+        </Select>
+      </div>
+    );
+    function handleInputChange(event,data) {
+      const {name, value} = event.target;
+      let token = Cookies.get('access_token');
+      token = ("Bearer " + token);
+      axios.defaults.headers.common['Authorization'] = token;
+      axios.post(URL_PREFIX + "order/update", {
+        id: data.id,
+        orderLink: data.orderLink,
+        trackingLink: data.trackingLink,
+        address: data.address,
+        usdPrice: data.usdPrice,
+        tax: data.tax,
+        totalValueUsd: data.totalValueUsd,
+        rate: data.rate,
+        totalValueVnd: data.totalValueVnd,
+        note: data.note,
+        number: data.number,
+        status : value
+      }).then(r => {
+        if (r.status == 200) {
+          getData((a) => onChange(a));
+        }
+      }).catch();
+
+    }
   }
 
   // const [auth, setAuth] = React.useState(undefined);
@@ -146,10 +196,10 @@ const LatestOrders = props => {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
     let url = window.location.href;
-    let URL = "http://112.78.4.119:8080/order/getList";
+    let URL = URL_PREFIX + "order/getList";
     if (url.indexOf('customerId') > 0) {
       let customerId = url.split("=")[1];
-      URL = "http://112.78.4.119:8080/order/getListByCustomer?customerId=" + customerId;
+      URL = URL_PREFIX + "order/getListByCustomer?customerId=" + customerId;
     }
     axios.defaults.headers.common['Authorization'] = token;
     axios.get(URL, {}).then(r => {
@@ -164,8 +214,28 @@ const LatestOrders = props => {
 
   };
 
-  function assignStaff(orderId, staffId, callback) {
+  function saveOrder(data) {
+    let token = Cookies.get('access_token');
+    token = ("Bearer " + token);
 
+    axios.defaults.headers.common['Authorization'] = token;
+    axios.post(URL_PREFIX + "order/update", {
+      id: data.id,
+      orderLink: data.orderLink,
+      trackingLink: data.trackingLink,
+      address: data.address,
+      usdPrice: data.usdPrice,
+      tax: data.tax,
+      totalValueUsd: data.totalValueUsd,
+      rate: data.rate,
+      totalValueVnd: data.totalValueVnd,
+      note: data.note,
+      number: data.number
+    }).then(r => {
+      if (r.status == 200) {
+        getData((a) => onChange(a));
+      }
+    }).catch();
 
   };
 
@@ -198,7 +268,7 @@ const LatestOrders = props => {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
 
-    let URL = "http://112.78.4.119:8080/order/complete";
+    let URL = URL_PREFIX + "order/complete";
     axios.defaults.headers.common['Authorization'] = token;
     axios.post(URL, {
       orderId: orderId,
@@ -225,7 +295,7 @@ const LatestOrders = props => {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
 
-    let URL = "http://112.78.4.119:8080/order/assign";
+    let URL = URL_PREFIX + "order/assign";
     axios.defaults.headers.common['Authorization'] = token;
     axios.post(URL, {
       orderId: orderId,
@@ -245,7 +315,7 @@ const LatestOrders = props => {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
 
-    let URL = "http://112.78.4.119:8080/order/perform";
+    let URL = URL_PREFIX + "order/perform";
     axios.defaults.headers.common['Authorization'] = token;
     axios.post(URL, {
       orderId: orderId,
@@ -277,7 +347,7 @@ const LatestOrders = props => {
           <ReactTable
             data={data.order}
             columns={columns}
-            className="-striped -highlight"
+            // className="-striped -highlight"
             resolveData={data => data.map(row => row)}
             filterable
             defaultFilterMethod={(filter, row) =>

@@ -15,7 +15,7 @@ import Container from '@material-ui/core/Container';
 import Cookies from 'js-cookie'
 import axios from "axios";
 import {Redirect} from "react-router-dom";
-import Authentication, {authentication} from "./Authentication";
+import Authentication, {authentication, URL_PREFIX} from "./Authentication";
 
 
 
@@ -61,7 +61,7 @@ export default function SignIn(props) {
   function login() {
     console.log(user);
 
-    let url = "http://112.78.4.119:8080/login/process?username=" + user.username + "&password=" + user.password;
+    let url = URL_PREFIX + "login/process?username=" + user.username + "&password=" + user.password;
     axios.post(url, {
       headers: {
         'Hose': '112.78.4.119:8080',

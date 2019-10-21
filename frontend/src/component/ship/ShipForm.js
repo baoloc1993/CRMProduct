@@ -8,6 +8,7 @@ import Cookies from "js-cookie";
 import {Route} from "react-router";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
+import {URL_PREFIX} from "../Authentication";
 
 const useStyles = makeStyles(theme => ({
     appBar: {
@@ -77,7 +78,7 @@ const ShipForm = props => {
         token = ("Bearer " + token);
 
         axios.defaults.headers.common['Authorization'] = token;
-        axios.post("http://112.78.4.119:8080/order/update", {
+        axios.post(URL_PREFIX + "order/update", {
             id: id,
             orderLink: form.orderLink,
             trackingLink: form.trackingLink,
@@ -108,7 +109,7 @@ const ShipForm = props => {
         let token = Cookies.get('access_token');
         token = ("Bearer " + token);
         axios.defaults.headers.common['Authorization'] = token;
-        axios.post("http://112.78.4.119:8080/order/create", {
+        axios.post(URL_PREFIX + "order/create", {
             orderLink: form.orderLink,
             trackingLink: form.trackingLink,
             address: form.address,

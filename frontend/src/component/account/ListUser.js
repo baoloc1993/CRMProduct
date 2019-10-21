@@ -24,6 +24,7 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
+import {URL_PREFIX} from "../Authentication";
 
 
 const useStyles = makeStyles(theme => ({
@@ -57,7 +58,7 @@ const LatestOrders = props => {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
     let url = window.location.href;
-    let URL = "http://112.78.4.119:8080/listUsers";
+    let URL = URL_PREFIX + "listUsers";
     axios.defaults.headers.common['Authorization'] = token;
     axios.get(URL, {}).then(r => {
       if (r.status == 200) {
@@ -100,7 +101,7 @@ const LatestOrders = props => {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);
 
-    let URL = "http://112.78.4.119:8080/changeRole";
+    let URL = URL_PREFIX + "changeRole";
     axios.defaults.headers.common['Authorization'] = token;
     axios.post(URL, {
       roleId :roleId,
