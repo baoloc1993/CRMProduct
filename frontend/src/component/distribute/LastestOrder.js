@@ -137,7 +137,7 @@ const LatestOrders = props => {
   function renderEditable(cellInfo) {
     return (
       <div
-        style={{backgroundColor: "#fafafa"}}
+
         contentEditable
         suppressContentEditableWarning
         onBlur={e => {
@@ -151,7 +151,7 @@ const LatestOrders = props => {
   function renderStatusEditable(cellInfo) {
     console.log (data.order[cellInfo.row._index]);
     return (
-      <div style={{backgroundColor: "#fafafa"}}
+      <div
         contentEditable
         suppressContentEditableWarning>
         <Select value={data.order[cellInfo.row._index].status.id}
@@ -230,7 +230,8 @@ const LatestOrders = props => {
       rate: data.rate,
       totalValueVnd: data.totalValueVnd,
       note: data.note,
-      number: data.number
+      number: data.number,
+      status : data.status.id
     }).then(r => {
       if (r.status == 200) {
         getData((a) => onChange(a));
