@@ -280,6 +280,10 @@ public class OrderController {
                     staffs.add(staff);
                 }
             });
+            List<User> customers = new ArrayList<>();
+            userRepository.findAll().forEach(staff -> {
+                    customers.add(staff);
+            });
             List<OrderRecord> listOrder = new ArrayList<>();
             if (user.getRole().getName().equals(Constant.ADMIN)) {
                 List<OrderRecord> finalListOrder = listOrder;
@@ -292,10 +296,12 @@ public class OrderController {
             statusRepository.findAll().forEach(status -> {
                 statuses.add(status);
             });
-
+            System.out.println(statuses.size());
             model.addAttribute("order", listOrder);
             model.addAttribute("staff", staffs);
+            model.addAttribute("customer", customers);
             model.addAttribute("status", statuses);
+            System.out.println("test");
             return ok(model);
         } catch (Exception e) {
             logger.error(e.getMessage());

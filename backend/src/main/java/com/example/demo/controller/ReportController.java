@@ -45,8 +45,8 @@ public class ReportController {
     @RequestMapping(value = "/getReport", method = RequestMethod.GET)
     public ResponseEntity createOrder(Model model, @RequestParam String startDateStr, @RequestParam String endDateStr) {
         try {
-            Date startDate = new SimpleDateFormat("yyyy/MM/dd").parse(startDateStr);
-            Date endDate = new SimpleDateFormat("yyyy/MM/dd").parse(endDateStr);
+            Date startDate = new SimpleDateFormat("MM/dd/yyyy").parse(startDateStr);
+            Date endDate = new SimpleDateFormat("MM/dd/yyyy").parse(endDateStr);
 
             LocalDateTime startDateTime = LocalDate.from(startDate.toInstant().atZone(ZoneId.systemDefault())
                     .toLocalDate()).atStartOfDay();
