@@ -25,6 +25,7 @@ import axios from "axios";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import {URL_PREFIX} from "../Authentication";
+import Header from "../Header";
 
 
 const useStyles = makeStyles(theme => ({
@@ -122,9 +123,7 @@ const LatestOrders = props => {
       <Card
         className={clsx(classes.root)}
       >
-        <CardHeader
-          title="List Orders"
-        />
+        <Header/>
         <Divider/>
         <CardContent className={classes.content}>
           <PerfectScrollbar>

@@ -13,6 +13,7 @@ import Typography from '@material-ui/core/Typography';
 import ShipForm from "./ShipForm";
 import {authentication, getRole} from "../Authentication";
 import Redirect from "react-router-dom/es/Redirect";
+import Header from "../Header";
 
 function Copyright() {
   return (
@@ -96,13 +97,7 @@ export default function Checkout(props) {
     return (
       <React.Fragment>
         <CssBaseline/>
-        <AppBar position="absolute" color="default" className={classes.appBar}>
-          <Toolbar>
-            <Typography variant="h6" color="inherit" noWrap>
-              Company name
-            </Typography>
-          </Toolbar>
-        </AppBar>
+       <Header/>
         <main className={classes.layout}>
           <Paper className={classes.paper}>
             <Typography component="h1" variant="h4" align="center">

@@ -21,6 +21,7 @@ import {Select} from "@material-ui/core";
 import MenuItem from "@material-ui/core/MenuItem";
 import InputLabel from "@material-ui/core/InputLabel";
 import {PersonAdd} from "@material-ui/icons";
+import Header from "../Header";
 
 
 const useStyles = makeStyles(theme => ({
@@ -114,6 +115,7 @@ export default function SignIn(props) {
 
   function generatePage() {
     return (
+
       <Container component="main" maxWidth="xs">
         <CssBaseline/>
         <div className={classes.paper}>

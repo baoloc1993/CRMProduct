@@ -14,6 +14,8 @@ import Button from "@material-ui/core/Button";
 import ReactFileReader from 'react-file-reader';
 import DatePicker from "react-datepicker";
 import {URL_PREFIX} from "../Authentication";
+import Header from "../Header";
+import Container from "@material-ui/core/Container";
 
 const useStyles = makeStyles(theme => ({
   appBar: {
@@ -143,13 +145,7 @@ export default function ImportData() {
     return (
       <React.Fragment>
         <CssBaseline/>
-        <AppBar position="absolute" color="default" className={classes.appBar}>
-          <Toolbar>
-            <Typography variant="h6" color="inherit" noWrap>
-              Company name
-            </Typography>
-          </Toolbar>
-        </AppBar>
+        <Header/>
         <main className={classes.layout}>
           <Paper className={classes.paper}>
             <Typography component="h1" variant="h4" align="center">

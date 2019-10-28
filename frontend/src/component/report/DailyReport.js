@@ -23,6 +23,8 @@ import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import {URL_PREFIX} from "../Authentication";
+import Header from "../Header";
+import Container from "@material-ui/core/Container";
 
 
 const useStyles = makeStyles(theme => ({
@@ -126,6 +128,7 @@ const DailyReport = props => {
   function generatePage() {
     return (
       <div className={classes.root}>
+        <Header/>
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Typography variant="h1" component="h3">Reports</Typography>

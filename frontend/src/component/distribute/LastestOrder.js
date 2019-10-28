@@ -25,6 +25,7 @@ import ReactTable from 'react-table'
 import Moment from 'moment'
 import 'react-table/react-table.css'
 import {URL_PREFIX} from "../Authentication";
+import Header from "../Header";
 
 
 const useStyles = makeStyles(theme => ({
@@ -149,7 +150,6 @@ const LatestOrders = props => {
     );
   }
   function renderStatusEditable(cellInfo) {
-    console.log (data.order[cellInfo.row._index]);
     return (
       <div
         contentEditable
@@ -338,9 +338,9 @@ const LatestOrders = props => {
       <Card
         className={clsx(classes.root)}
       >
-        <CardHeader
-          title="List Orders"
-        />
+        {/*<CardHeader>*/}
+          <Header/>
+        {/*</CardHeader>*/}
         <Divider/>
         <CardContent className={classes.content}>
           {/*<ScrollBar>*/}

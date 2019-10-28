@@ -18,6 +18,8 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import Button from "@material-ui/core/Button";
 import {InputLabel} from "@material-ui/core";
+import Header from "../Header";
+import Container from "@material-ui/core/Container";
 
 const useStyles = makeStyles(theme => ({
     appBar: {
@@ -122,13 +124,7 @@ export default function Payment() {
         return (
             <React.Fragment>
                 <CssBaseline/>
-                <AppBar position="absolute" color="default" className={classes.appBar}>
-                    <Toolbar>
-                        <Typography variant="h6" color="inherit" noWrap>
-                            Company name
-                        </Typography>
-                    </Toolbar>
-                </AppBar>
+                <Header/>
                 <main className={classes.layout}>
                     <Paper className={classes.paper}>
                         <Typography component="h1" variant="h4" align="center">
