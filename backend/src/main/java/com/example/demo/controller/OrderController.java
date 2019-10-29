@@ -3,12 +3,11 @@ package com.example.demo.controller;
 import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.ok;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -296,6 +295,61 @@ public class OrderController {
             statusRepository.findAll().forEach(status -> {
                 statuses.add(status);
             });
+            System.out.println(statuses.size());
+            model.addAttribute("order", listOrder);
+            model.addAttribute("staff", staffs);
+            model.addAttribute("customer", customers);
+            model.addAttribute("status", statuses);
+            System.out.println("test");
+            return ok(model);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return ok(model);
+        }
+    }
+    @RequestMapping(value = "/getListByDate", method = RequestMethod.GET)
+    public ResponseEntity getListOrder(Model model,
+                                       @RequestParam String startDateStr, @RequestParam String endDateStr,
+                                       @RequestHeader("Authorization") String authorization) {
+        try {
+            String userName = jwtTokenProvider.getUsername(authorization.substring(7));
+            User user = userRepository.findUserByUsername(userName);
+            List<User> staffs = new ArrayList<>();
+            userRepository.findAll().forEach(staff -> {
+                if (staff.getRole().getName().equals(Constant.STAFF)) {
+                    staffs.add(staff);
+                }
+            });
+            List<User> customers = new ArrayList<>();
+            userRepository.findAll().forEach(staff -> {
+                customers.add(staff);
+            });
+            List<OrderRecord> listOrder = new ArrayList<>();
+            if (startDateStr.compareTo("none") != 0){
+                if (user.getRole().getName().equals(Constant.ADMIN)) {
+                    List<OrderRecord> finalListOrder = listOrder;
+                    orderRepository.findAll().forEach(order -> finalListOrder.add(order));
+                } else {
+                    listOrder = orderRepository.findList(user.getId()).stream().map(Optional::get).collect(Collectors.toList());
+                }
+                Date startDate = new SimpleDateFormat("MM/dd/yyyy").parse(startDateStr);
+                Date endDate = new SimpleDateFormat("MM/dd/yyyy").parse(endDateStr);
+
+                LocalDateTime startDateTime = LocalDate.from(startDate.toInstant().atZone(ZoneId.systemDefault())
+                        .toLocalDate()).atStartOfDay();
+                LocalDateTime endDateTime = LocalDate.from(endDate.toInstant().atZone(ZoneId.systemDefault())
+                        .toLocalDate().plusDays(1)).atStartOfDay();
+                listOrder = listOrder.stream().filter( orderRecord -> {
+                    LocalDateTime orderDateTime = orderRecord.getOrderDateTime();
+                    return orderDateTime.isBefore(endDateTime) && orderDateTime.isAfter(startDateTime);
+                }).collect(Collectors.toList());
+
+            }
+            List<OrderStatus> statuses = new ArrayList<>();
+            statusRepository.findAll().forEach(status -> {
+                statuses.add(status);
+            });
+
             System.out.println(statuses.size());
             model.addAttribute("order", listOrder);
             model.addAttribute("staff", staffs);

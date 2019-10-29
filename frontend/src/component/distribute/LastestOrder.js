@@ -30,6 +30,7 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import DatePicker from "react-datepicker";
+import zIndex from "@material-ui/core/styles/zIndex";
 
 
 const useStyles = makeStyles(theme => ({
@@ -160,7 +161,11 @@ const LatestOrders = props => {
             return Moment(d.orderDateTime)
                 .local()
                 .format("DD-MM-YYYY hh:mm:ss a")
-        }
+        },
+        filterMethod: (filter, row) => {
+        },
+        Filter: ({filter, onChange}) =>
+            <div/>
     }];
 
     function renderEditable(cellInfo) {
@@ -213,7 +218,7 @@ const LatestOrders = props => {
                 status: value
             }).then(r => {
                 if (r.status == 200) {
-                    getData((a) => onChange(a));
+                    getDataByDate(date.startDate,date.endDate,(a) => onChange(a));
                 }
             }).catch();
 
@@ -231,6 +236,36 @@ const LatestOrders = props => {
             let customerId = url.split("=")[1];
             URL = URL_PREFIX + "order/getListByCustomer?customerId=" + customerId;
         }
+        axios.defaults.headers.common['Authorization'] = token;
+        axios.get(URL, {}).then(r => {
+            if (r.status == 200) {
+                callback(r.data);
+            } else {
+                callback(undefined);
+            }
+        }).catch(e => {
+            callback(undefined);
+        });
+
+    };
+    function getDataByDate(startDate, endDate, callback) {
+        let startDateStr = "none";
+        let endDateStr = "none";
+        if (startDate === "none"){
+
+        }else{
+            startDateStr = Moment(startDate)
+                .local()
+                .format("MM/DD/YYYY");
+            endDateStr = Moment(endDate)
+                .local()
+                .format("MM/DD/YYYY");
+        }
+
+        let token = Cookies.get('access_token');
+        token = ("Bearer " + token);
+        let url = window.location.href;
+        let URL = URL_PREFIX + "order/getListByDate?startDateStr=" + startDateStr + "&endDateStr=" + endDateStr;
         axios.defaults.headers.common['Authorization'] = token;
         axios.get(URL, {}).then(r => {
             if (r.status == 200) {
@@ -271,7 +306,7 @@ const LatestOrders = props => {
     };
 
     if (data === undefined) {
-        getData((a) => onChange(a));
+        getDataByDate("none","none",(a) => onChange(a));
         return blank();
     } else {
         return generatePage();
@@ -362,18 +397,17 @@ const LatestOrders = props => {
     }
 
     function handleChangeStart(startDate) {
-
-        // getDataByDate(startDate, date.endDate, (a) => onChange(a));
+        getDataByDate(startDate, date.endDate, (a) => onChange(a));
+        setDate({...date, ['startDate']: startDate});
         // getData((a) => filterData(a));
         // hasDisplayTable(true);
-        setDate({...date, ['startDate']: startDate});
+
     }
 
     function handleChangeEnd(endDate) {
-
-        // getDataByDate(date.startDate, endDate, (a) => onChange(a));
-        // getData((a) => filterData(a));
+        getDataByDate(date.startDate, endDate, (a) => onChange(a));
         setDate({...date, ['endDate']: endDate});
+        // getData((a) => filterData(a));
         // hasDisplayTable(true);
 
 
@@ -445,43 +479,28 @@ const LatestOrders = props => {
                 <Divider/>
                 <CardContent className={classes.content}>
                     <br/>
-                    {/*<Grid container spacing={3}>*/}
-                    {/*    <Grid item xs={4}>*/}
-                    {/*        <Paper className={classes.paper}>*/}
-                    {/*            <Typography variant="h3" component="h3">Select Start Date</Typography>*/}
-                    {/*            <DatePicker*/}
-                    {/*                name="startDate"*/}
-                    {/*                selected={date.startDate}*/}
-                    {/*                onChange={handleChangeStart}*/}
-                    {/*                onSelect={(e) => handleSelectStart(e)}/>*/}
-                    {/*        </Paper>*/}
-                    {/*    </Grid>*/}
-                    {/*    <Grid item xs={4}>*/}
-                    {/*        <Paper className={classes.paper}>*/}
-                    {/*            <Typography variant="h3" component="h3">Select End Date</Typography>*/}
-                    {/*            <DatePicker*/}
-                    {/*                name="endDate"*/}
-                    {/*                selected={date.endDate}*/}
-                    {/*                onChange={handleChangeEnd}*/}
-                    {/*                onSelect={(e) => handleSelectEnd(e)}/>*/}
-                    {/*        </Paper>*/}
-                    {/*    </Grid>*/}
-                    {/*    <Grid item xs={4}>*/}
-                    {/*        <Paper className={classes.paper}>*/}
-                    {/*            <Typography variant="h3" component="h3">Select Customer</Typography>*/}
-                    {/*            <Select value={customerId}*/}
-                    {/*                    onChange={(event) => handleInputChangeCustomer(event)}*/}
-                    {/*                    name="userId"*/}
-                    {/*                    id="userId"*/}
-                    {/*                    label="Customer">*/}
-                    {/*                <MenuItem value={0}>All</MenuItem>*/}
-                    {/*                {data.customer.map(d => (*/}
-                    {/*                    <MenuItem value={d.id}>{d.name}</MenuItem>*/}
-                    {/*                ))}*/}
-                    {/*            </Select>*/}
-                    {/*        </Paper>*/}
-                    {/*    </Grid>*/}
-                    {/*</Grid>*/}
+                    <Grid container spacing={3}>
+                        <Grid item xs={4}>
+                            <Paper className={classes.paper}>
+                                <Typography variant="h3" component="h3">Select Start Date</Typography>
+                                <DatePicker
+                                    name="startDate"
+                                    selected={date.startDate}
+                                    onChange={handleChangeStart}
+                                    onSelect={(e) => handleSelectStart(e)}/>
+                            </Paper>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <Paper className={classes.paper}>
+                                <Typography variant="h3" component="h3">Select End Date</Typography>
+                                <DatePicker
+                                    name="endDate"
+                                    selected={date.endDate}
+                                    onChange={handleChangeEnd}
+                                    onSelect={(e) => handleSelectEnd(e)}/>
+                            </Paper>
+                        </Grid>
+                    </Grid>
                     {/*<ScrollBar>*/}
                     {/*<div className={classes.inner}>*/}
                     <br/>
