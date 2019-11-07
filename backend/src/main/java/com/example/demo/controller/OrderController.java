@@ -67,8 +67,7 @@ public class OrderController {
             if (StringUtils.isEmpty(orderRequest.getTrackingLink())
                     || StringUtils.isEmpty(orderRequest.getOrderLink())
                     || orderRequest.getUsdPrice() <= 0
-                || orderRequest.getTax() < 0
-                || orderRequest.getRate() <= 0) {
+                || orderRequest.getTax() < 0) {
                 return badRequest().build();
             }
             OrderRecord orderRecord = new OrderRecord();
@@ -127,10 +126,8 @@ public class OrderController {
         try {
             if (StringUtils.isEmpty(orderRequest.getTrackingLink())
                 || StringUtils.isEmpty(orderRequest.getOrderLink())
-                || orderRequest.getUsdPrice() <= 0
-                || orderRequest.getTax() < 0
-                || orderRequest.getRate() <= 0) {
-                return badRequest().build();
+                || orderRequest.getUsdPrice() <= 0) {
+                return badRequest().body("Vui lòng nhập đầy đủ trường");
             }
             OrderRecord orderRecord = new OrderRecord();
             OrderStatus orderStatus = statusRepository.findById(Constant.NEW).get();
@@ -140,7 +137,7 @@ public class OrderController {
         } catch (Exception e) {
             logger.error(e.getMessage());
             e.printStackTrace();
-            return badRequest().build();
+            return badRequest().body(e.getMessage());
         }
     }
 
@@ -355,7 +352,7 @@ public class OrderController {
             model.addAttribute("staff", staffs);
             model.addAttribute("customer", customers);
             model.addAttribute("status", statuses);
-            System.out.println("test");
+            model.addAttribute("role", user.getRole().getName());
             return ok(model);
         } catch (Exception e) {
             logger.error(e.getMessage());
