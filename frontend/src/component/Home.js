@@ -100,7 +100,7 @@ const pages = [
         title: 'Import Data',
         href: '/importData',
         icon: <ImportExport/>,
-        role : ['ADMIN']
+        role: ['ADMIN','CUSTOMER']
     }
 ];
 
@@ -112,7 +112,7 @@ function Home(props) {
     if (userRole === undefined){
         return blank();
     }else if (userRole === "GUEST"){
-        return fail;
+        return fail();
     }else{
         return generatePage()
     }
@@ -121,7 +121,7 @@ function Home(props) {
     }
 
     function fail() {
-        return (<div>NOT PERMITTED</div>)
+        window.location.href = "/login";
     }
 
     function blank() {

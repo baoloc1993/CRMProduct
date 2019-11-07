@@ -27,7 +27,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <Router history={history}>
         <Switch>
-          <Route exact path='/' component={SignIn}/>
+          <Route exact path='/' component={Home}/>
           <Route path='/login' component={SignIn}/>
           <Route path='/home' component={Home}/>
           <Route path='/ship' component={Checkout}/>

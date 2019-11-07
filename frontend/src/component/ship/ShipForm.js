@@ -119,7 +119,7 @@ const ShipForm = props => {
             rate: form.rate,
             totalValueVnd: form.totalValueVnd,
             note: form.note,
-            status: form.status,
+            status: form.status.id,
             number: form.number,
             customerName  :form.customerName
         }).then(r => {
@@ -127,10 +127,11 @@ const ShipForm = props => {
                 alert("SUCCESS");
                 window.location.href="/order";
             } else {
-                alert("FAIL");
-
+                alert(r.data);
             }
-        }).catch();
+        }).catch(e=>{
+            alert(e);
+        });
     }
 
     function handleInputChange(event) {
@@ -158,7 +159,7 @@ const ShipForm = props => {
                     />
                 </Grid>
 
-                <Grid item xs={12} sm={12} style={{display: checkRole(role, ["STAFF", "MANAGER", "ADMIN"])}}>
+                <Grid item xs={12} sm={12} style={{display: checkRole(role, ["CUSTOMER", "STAFF", "ADMIN"])}}>
                     <TextField
                         value={form.trackingLink}
                         id="trackingLink"
@@ -172,7 +173,7 @@ const ShipForm = props => {
                         }}
                     />
                 </Grid>
-                <Grid item xs={12} style={{display: checkRole(role, ["CUSTOMER", "MANAGER", "ADMIN"])}}>
+                <Grid item xs={12} style={{display: checkRole(role, ["CUSTOMER", "STAFF", "ADMIN"])}}>
                     <TextField
                         required
                         value={form.address}
@@ -203,7 +204,7 @@ const ShipForm = props => {
                         }}
                     />
                 </Grid>
-                <Grid item xs={12} style={{display: checkRole(role, ["STAFF", "MANAGER", "ADMIN"])}}>
+                <Grid item xs={12} style={{display: checkRole(role, ["CUSTOMER", "STAFF", "ADMIN"])}}>
                     <TextField
                         value={form.tax}
                         type="number"
@@ -218,7 +219,7 @@ const ShipForm = props => {
                         }}
                     />
                 </Grid>
-                <Grid item xs={12} style={{display: checkRole(role, ["MANAGER", "ADMIN"])}}>
+                <Grid item xs={12} style={{display: checkRole(role, ["STAFF", "ADMIN"])}}>
                     <TextField
                         value={form.totalValueUsd}
                         type="number"
@@ -233,7 +234,7 @@ const ShipForm = props => {
 
                     />
                 </Grid>
-                <Grid item xs={12} style={{display: checkRole(role, ["MANAGER", "ADMIN"])}}>
+                <Grid item xs={12} style={{display: checkRole(role, [ "ADMIN"])}}>
                     <TextField
                         value={form.rate}
                         type="number"
@@ -248,7 +249,7 @@ const ShipForm = props => {
                         }}
                     />
                 </Grid>
-                <Grid item xs={12} style={{display: checkRole(role, ["MANAGER", "ADMIN"])}}>
+                <Grid item xs={12} style={{display: checkRole(role, ["ADMIN"])}}>
                     <TextField
                         value={form.totalValueVnd}
                         type="number"
@@ -262,7 +263,7 @@ const ShipForm = props => {
                         }}
                     />
                 </Grid>
-                <Grid item xs={12} sm={12} style={{display: checkRole(role, ["CUSTOMER", "MANAGER", "ADMIN"])}}>
+                <Grid item xs={12} sm={12} style={{display: checkRole(role, ["CUSTOMER", "STAFF", "ADMIN"])}}>
                     <TextField
                         value={form.number}
                         type="number"
@@ -276,7 +277,7 @@ const ShipForm = props => {
                             readOnly: disable,
                         }}/>
                 </Grid>
-                <Grid item xs={12} sm={12} style={{display: checkRole(role, ["CUSTOMER", "MANAGER", "ADMIN"])}}>
+                <Grid item xs={12} sm={12} style={{display: checkRole(role, ["CUSTOMER", "STAFF", "ADMIN"])}}>
                     <TextField
                         value={form.note}
                         id="note"
@@ -290,7 +291,7 @@ const ShipForm = props => {
                             readOnly: disable,
                         }}/>
                 </Grid>
-                <Grid item xs={12} style={{display: checkRole(role, ["MANAGER", "ADMIN"])}}>
+                <Grid item xs={12} style={{display: checkRole(role, ["STAFF", "ADMIN"])}}>
                     <Select value={form.status.id}
                             onChange={(event) => handleInputChange(event)}
                             name="status"

@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie'
 import axios from "axios";
 
-export const URL_PREFIX = "http://112.78.4.119:8080/";
+export const URL_PREFIX = "http://localhost:8080/";
 export const authentication =  (url,callback) => {
     let token = Cookies.get('access_token');
     token = ("Bearer " + token);

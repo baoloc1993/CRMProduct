@@ -102,7 +102,7 @@ const pages = [
         title: 'Import Data',
         href: '/importData',
         icon: <ImportExport/>,
-        role: ['ADMIN']
+        role: ['ADMIN','CUSTOMER']
     }
 ];
 
@@ -142,6 +142,8 @@ function Header(props) {
                             className={classes.button}
                             component={CustomRouterLink}
                             to={page.href}
+                            style={{display: checkRole(userRole, page.role)}}
+
                         >
                             <div className={classes.icon}>{page.icon}</div>
                             {page.title}

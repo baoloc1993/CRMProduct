@@ -125,12 +125,12 @@ const LatestOrders = props => {
         id: "usdPrice",
         Header: 'USD Price',
         accessor: d => d.usdPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        Cell: (cellInfo) => renderEditable(cellInfo)
+        Cell: (cellInfo) => renderEditable(cellInfo,["STAFF", "ADMIN"])
     }, {
         id: "tax",
         Header: 'Tax',
         accessor: 'tax',
-        Cell: (cellInfo) => renderEditable(cellInfo)
+        Cell: (cellInfo) => renderEditable(cellInfo,["STAFF", "ADMIN"])
     }, {
         id: "totalUsd",
         Header: 'Total Price USD',
@@ -139,7 +139,7 @@ const LatestOrders = props => {
         id: "rate",
         Header: 'Rate',
         accessor: d => d.rate.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        Cell: (cellInfo) => renderEditable(cellInfo)
+        Cell: (cellInfo) => renderEditable(cellInfo,["ADMIN"])
     }, {
         id: "totalVnd",
         Header: 'VND Price',
@@ -168,10 +168,10 @@ const LatestOrders = props => {
             <div/>
     }];
 
-    function renderEditable(cellInfo) {
-        return (
-            <div
-
+    function renderEditable(cellInfo,role) {
+        if (role === undefined){
+            return (
+              <div
                 contentEditable
                 suppressContentEditableWarning
                 onBlur={e => {
@@ -179,8 +179,30 @@ const LatestOrders = props => {
                     setData(data);
                     saveOrder(cellInfo.row._original);
                 }}
-            >{data.order[cellInfo.index][cellInfo.column.id]}</div>
-        );
+              >{data.order[cellInfo.index][cellInfo.column.id]}</div>
+            );
+        }else{
+            if (role.indexOf(data.role) > 0){
+                return (
+                  <div
+                    contentEditable
+                    suppressContentEditableWarning
+                    onBlur={e => {
+                        data.order[cellInfo.index][cellInfo.column.id] = e.target.innerHTML;
+                        setData(data);
+                        saveOrder(cellInfo.row._original);
+                    }}
+                  >{data.order[cellInfo.index][cellInfo.column.id]}</div>
+                );
+            }else{
+                return (
+                  <div
+                    suppressContentEditableWarning
+                  >{data.order[cellInfo.index][cellInfo.column.id]}</div>
+                );
+            }
+        }
+
     }
 
     function renderStatusEditable(cellInfo) {
@@ -227,27 +249,27 @@ const LatestOrders = props => {
 
     // const [auth, setAuth] = React.useState(undefined);
 
-    function getData(callback) {
-        let token = Cookies.get('access_token');
-        token = ("Bearer " + token);
-        let url = window.location.href;
-        let URL = URL_PREFIX + "order/getList";
-        if (url.indexOf('customerId') > 0) {
-            let customerId = url.split("=")[1];
-            URL = URL_PREFIX + "order/getListByCustomer?customerId=" + customerId;
-        }
-        axios.defaults.headers.common['Authorization'] = token;
-        axios.get(URL, {}).then(r => {
-            if (r.status == 200) {
-                callback(r.data);
-            } else {
-                callback(undefined);
-            }
-        }).catch(e => {
-            callback(undefined);
-        });
-
-    };
+    // function getData(callback) {
+    //     let token = Cookies.get('access_token');
+    //     token = ("Bearer " + token);
+    //     let url = window.location.href;
+    //     let URL = URL_PREFIX + "order/getList";
+    //     if (url.indexOf('customerId') > 0) {
+    //         let customerId = url.split("=")[1];
+    //         URL = URL_PREFIX + "order/getListByCustomer?customerId=" + customerId;
+    //     }
+    //     axios.defaults.headers.common['Authorization'] = token;
+    //     axios.get(URL, {}).then(r => {
+    //         if (r.status == 200) {
+    //             callback(r.data);
+    //         } else {
+    //             callback(undefined);
+    //         }
+    //     }).catch(e => {
+    //         callback(undefined);
+    //     });
+    //
+    // };
     function getDataByDate(startDate, endDate, callback) {
         let startDateStr = "none";
         let endDateStr = "none";
@@ -299,7 +321,7 @@ const LatestOrders = props => {
             status: data.status.id
         }).then(r => {
             if (r.status == 200) {
-                getData((a) => onChange(a));
+                getDataByDate(date.startDate,date.endDate,(a) => onChange(a));
             }
         }).catch();
 
