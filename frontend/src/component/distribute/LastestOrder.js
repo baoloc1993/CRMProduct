@@ -152,7 +152,9 @@ const LatestOrders = props => {
     }, {
         id: "assign",
         Header: 'Assign',
-        accessor: d => d.personInCharge === null ? "" : d.personInCharge.username
+        accessor: d => d.personInCharge === null ? "" : d.personInCharge.name,
+        Cell: (cellInfo) => renderAssignEditable(cellInfo,["ADMIN"])
+
     }, {
         id: "date",
         Header: 'Order Date Time',
@@ -182,7 +184,7 @@ const LatestOrders = props => {
               >{data.order[cellInfo.index][cellInfo.column.id]}</div>
             );
         }else{
-            if (role.indexOf(data.role) > 0){
+            if (role.indexOf(data.role) >= 0){
                 return (
                   <div
                     contentEditable
@@ -244,6 +246,43 @@ const LatestOrders = props => {
                 }
             }).catch();
 
+        }
+    }
+
+    function renderAssignEditable(cellInfo,role) {
+        if (cellInfo.value !== undefined && cellInfo.value !== "" || role.indexOf(data.role) < 0){
+            return (<div>{cellInfo.value}</div>)
+        }
+        return (
+          <div
+            contentEditable
+            suppressContentEditableWarning>
+              <Select value={data.order[cellInfo.row._index].personInCharge.name}
+                      onChange={(event) => handleInputChange(event, cellInfo.row._original)}>
+                  {data.staff.map(staff => (
+                    <MenuItem value={staff.id}>{staff.name}</MenuItem>
+                  ))}
+
+              </Select>
+          </div>
+        );
+
+        function handleInputChange(event, data) {
+            const {name, value} = event.target;
+            let token = Cookies.get('access_token');
+            token = ("Bearer " + token);
+            axios.defaults.headers.common['Authorization'] = token;
+            let URL = URL_PREFIX + "order/assign";
+            axios.post(URL, {
+                orderId: data.id,
+                staffId: value
+            }).then(r => {
+                if (r.status == 200) {
+                    getDataByDate(date.startDate,date.endDate,(a) => onChange(a));
+                }
+            }).catch(e => {
+                getDataByDate(date.startDate,date.endDate,(a) => onChange(a));
+            });
         }
     }
 

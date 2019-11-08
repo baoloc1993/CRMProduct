@@ -56,19 +56,19 @@ const pages = [
         title: 'Create Order',
         href: '/ship',
         icon: <Shop/>,
-        role: ['ADMIN', "CUSTOMER", "MANAGER"]
+        role: ['ADMIN', "CUSTOMER", "MANAGER","STAFF"]
     },
     {
         title: 'View Orders',
         href: '/order',
         icon: <ShoppingCart/>,
-        role: ['ADMIN', "CUSTOMER", "MANAGER"]
+        role: ['ADMIN', "CUSTOMER", "MANAGER","STAFF"]
     },
     {
         title: 'Log out',
         href: '/logout',
         icon: <ArrowBack/>,
-        role: ['ADMIN', "CUSTOMER", "MANAGER"]
+        role: ['ADMIN', "CUSTOMER", "MANAGER","STAFF"]
     },
 
     {
