@@ -326,8 +326,20 @@ public class OrderController {
                 if (user.getRole().getName().equals(Constant.ADMIN)) {
                     List<OrderRecord> finalListOrder = listOrder;
                     orderRepository.findAll().forEach(order -> finalListOrder.add(order));
-                } else {
-                    listOrder = orderRepository.findList(user.getId()).stream().map(Optional::get).collect(Collectors.toList());
+                } else if (user.getRole().getName().equals(Constant.CUSTOMER)) {
+                    List<OrderRecord> finalListOrder = listOrder;
+                    orderRepository.findAll().forEach(order -> {
+                        if (order.getCustomer().getId() == user.getId()){
+                            finalListOrder.add(order);
+                        }
+                    });
+                } else if (user.getRole().getName().equals(Constant.STAFF)) {
+                    List<OrderRecord> finalListOrder = listOrder;
+                    orderRepository.findAll().forEach(order -> {
+                        if (order.getPersonInCharge().getId() == user.getId()){
+                            finalListOrder.add(order);
+                        }
+                    });
                 }
                 Date startDate = new SimpleDateFormat("MM/dd/yyyy").parse(startDateStr);
                 Date endDate = new SimpleDateFormat("MM/dd/yyyy").parse(endDateStr);

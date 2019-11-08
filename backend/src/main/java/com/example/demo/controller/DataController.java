@@ -123,19 +123,27 @@ public class DataController {
     } catch (ParseException e) {
       e.printStackTrace();
     }
-
-    System.out.println(migrateRequest.getData());
-    return ok(model);
+    return ok().build();
   }
 
   @RequestMapping(value = "/getCustomers", method = RequestMethod.GET)
-  public ResponseEntity getCustomers(Model model) {
-    List<User> customers = new ArrayList<>();
-    userRepository.findAll().forEach(user -> {
-      if (user.getRole().getId() == Constant.ROLE_CUSTOMER) {
-        customers.add(user);
+  public ResponseEntity getCustomers(Model model, @RequestHeader("Authorization") String authorization) {
+      String managerUsername = jwtTokenProvider.getUsername(authorization.substring(7));
+      User manager = userRepository.findUserByUsername(managerUsername);
+      List<User> customers = new ArrayList<>();
+      if (manager.getRole().getId() != Constant.ROLE_CUSTOMER){
+          userRepository.findAll().forEach(user -> {
+              if (user.getRole().getId() == Constant.ROLE_CUSTOMER) {
+                  customers.add(user);
+              }});
+      }else{
+          userRepository.findAll().forEach(user -> {
+              if (user.getId() == manager.getId()) {
+                  customers.add(user);
+              }});
       }
-    });
+
+
     model.addAttribute("customers", customers);
     return ok(model);
   }

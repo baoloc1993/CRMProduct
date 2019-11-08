@@ -50,8 +50,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.POST, "/login/addUser").hasRole(Constant.ADMIN)
         .antMatchers(HttpMethod.POST, "/report/*").hasRole(Constant.ADMIN)
         .antMatchers(HttpMethod.GET, "/report/*").hasRole(Constant.ADMIN)
-        .antMatchers(HttpMethod.POST, "/data/*").hasRole(Constant.ADMIN)
-        .antMatchers(HttpMethod.GET, "/data/*").hasRole(Constant.ADMIN)
+        .antMatchers(HttpMethod.POST, "/data/*").hasAnyRole(Constant.ADMIN, Constant.MANAGER, Constant.STAFF, Constant.CUSTOMER)
+        .antMatchers(HttpMethod.GET, "/data/*").hasAnyRole(Constant.ADMIN, Constant.MANAGER, Constant.STAFF, Constant.CUSTOMER)
         .antMatchers(HttpMethod.POST, "/order/create").permitAll()
         .antMatchers(HttpMethod.GET, "/migrateData").permitAll()
 
