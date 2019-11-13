@@ -263,8 +263,7 @@ const transactionColumn = [
     id: "date",
     Header: 'Payment Date',
     accessor: d => {
-      d.payDateTime[1] = d.payDateTime[1] - 1;
-      return Moment(d.payDateTime)
+      return Moment(d.payDateTime*1000)
         .local()
         .format("YYYY-MM-DD hh:mm:ss a")
     }
