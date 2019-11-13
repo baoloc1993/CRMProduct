@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -40,20 +41,20 @@ public class OrderRecord {
   /**
    * Date customer create order
    */
-  LocalDateTime orderDateTime;
+  ZonedDateTime orderDateTime;
   /**
    * Date manager assign order
    */
-  LocalDateTime assignDateTime;
+  ZonedDateTime assignDateTime;
   /**
    * Date PIC take the order
    */
-  LocalDateTime picDateTime;
+  ZonedDateTime picDateTime;
 
   /**
    * Date order finish
    */
-  LocalDateTime completedDateTime;
+  ZonedDateTime completedDateTime;
 
   @ManyToOne
   @JoinColumn(name = "customer_id", referencedColumnName = "id")

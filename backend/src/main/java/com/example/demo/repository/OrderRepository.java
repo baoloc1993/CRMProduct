@@ -1,6 +1,7 @@
 package com.example.demo.repository;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,5 +28,5 @@ public interface OrderRepository extends CrudRepository<OrderRecord, Integer> {
     List<Optional<OrderRecord>> findList(int userId);
 
     @Query("FROM OrderRecord WHERE orderDateTime BETWEEN  ?1 AND ?2")
-    List<Optional<OrderRecord>> findListByDate(LocalDateTime startDate, LocalDateTime endDate);
+    List<Optional<OrderRecord>> findListByDate(ZonedDateTime startDate, ZonedDateTime endDate);
 }

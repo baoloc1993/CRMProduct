@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
 @AllArgsConstructor
@@ -16,7 +17,7 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     int id;
 
-    LocalDateTime payDateTime;
+    ZonedDateTime payDateTime;
 
     float payAmountVnd;
 

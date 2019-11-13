@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -53,7 +54,7 @@ public class ImportData {
             if (StringUtils.isEmpty(rate)) rate = "0";
             String totalVND = data[TOTAL_VND].replace(",","");
             OrderRecord orderRecord = new OrderRecord();
-            LocalDateTime registerDateTime = LocalDateTime.now();
+            ZonedDateTime registerDateTime = ZonedDateTime.now();
             orderRecord.setAddress(address);
             User bot =  userRepository.findUserByUsername("bot");
 

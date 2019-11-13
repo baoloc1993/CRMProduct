@@ -105,16 +105,19 @@ const LatestOrders = props => {
         id: "orderLink",
         Header: 'Order Link',
         accessor: 'orderLink',
+        style: { 'white-space': 'unset' },
         Cell: (cellInfo) => renderEditable(cellInfo)
     }, {
         id: "trackingLink",
         Header: 'Track Link',
         accessor: 'trackingLink',
+        style: { 'white-space': 'unset' },
         Cell: (cellInfo) => renderEditable(cellInfo)
     }, {
         id: "address",
         Header: 'Ship Information',
         accessor: 'address',
+        style: { 'white-space': 'unset' },
         Cell: (cellInfo) => renderEditable(cellInfo)
     }, {
         id: "number",
@@ -158,9 +161,9 @@ const LatestOrders = props => {
     }, {
         id: "date",
         Header: 'Order Date Time',
+        style: { 'white-space': 'unset' },
         accessor: d => {
-            d.orderDateTime[1] = d.orderDateTime[1] - 1;
-            return Moment(d.orderDateTime)
+            return Moment(d.orderDateTime*1000)
                 .local()
                 .format("DD-MM-YYYY hh:mm:ss a")
         },
@@ -179,6 +182,7 @@ const LatestOrders = props => {
                 onBlur={e => {
                     data.order[cellInfo.index][cellInfo.column.id] = e.target.innerHTML;
                     setData(data);
+                    console.log (cellInfo.row._original);
                     saveOrder(cellInfo.row._original);
                 }}
               >{data.order[cellInfo.index][cellInfo.column.id]}</div>
@@ -192,6 +196,7 @@ const LatestOrders = props => {
                     onBlur={e => {
                         data.order[cellInfo.index][cellInfo.column.id] = e.target.innerHTML;
                         setData(data);
+                        console.log (cellInfo.row._original);
                         saveOrder(cellInfo.row._original);
                     }}
                   >{data.order[cellInfo.index][cellInfo.column.id]}</div>
@@ -250,14 +255,14 @@ const LatestOrders = props => {
     }
 
     function renderAssignEditable(cellInfo,role) {
-        if (cellInfo.value !== undefined && cellInfo.value !== "" || role.indexOf(data.role) < 0){
+        if (data.order[cellInfo.row._index].personInCharge !== null ||cellInfo.value !== undefined && cellInfo.value !== "" || role.indexOf(data.role) < 0){
             return (<div>{cellInfo.value}</div>)
         }
         return (
           <div
             contentEditable
             suppressContentEditableWarning>
-              <Select value={data.order[cellInfo.row._index].personInCharge.name}
+              <Select
                       onChange={(event) => handleInputChange(event, cellInfo.row._original)}>
                   {data.staff.map(staff => (
                     <MenuItem value={staff.id}>{staff.name}</MenuItem>

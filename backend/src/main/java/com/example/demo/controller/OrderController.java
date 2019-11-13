@@ -7,6 +7,9 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,17 +67,15 @@ public class OrderController {
     public ResponseEntity updateOrder(Model model, @RequestBody OrderRequest orderRequest,
                                       @RequestHeader("Authorization") String authorization) {
         try {
-            if (StringUtils.isEmpty(orderRequest.getTrackingLink())
-                    || StringUtils.isEmpty(orderRequest.getOrderLink())
-                    || orderRequest.getUsdPrice() <= 0
-                || orderRequest.getTax() < 0) {
+            if (orderRequest.getUsdPrice() <= 0
+                    || orderRequest.getTax() < 0) {
                 return badRequest().build();
             }
-            OrderRecord orderRecord = new OrderRecord();
-            orderRecord.setId(orderRequest.getId());
+            OrderRecord orderRecord = orderRepository.findById(orderRequest.getId()).get();
             OrderStatus orderStatus = statusRepository.findById(orderRequest.getStatus()).get();
             orderRecord.setStatus(orderStatus);
-            addOrder(orderRequest, orderRecord,authorization);
+            addOrder(orderRequest, orderRecord, authorization);
+
             return ok().build();
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -83,12 +84,9 @@ public class OrderController {
         }
     }
 
-    private void addOrder(OrderRequest orderRequest,OrderRecord orderRecord,String authorization) {
-        String userName = jwtTokenProvider.getUsername(authorization.substring(7));
-        LocalDateTime registerDateTime = LocalDateTime.now();
-        User user = userRepository.findUserByUsername(userName);
+    private void addOrder(OrderRequest orderRequest, OrderRecord orderRecord, String authorization) {
+        ZonedDateTime registerDateTime = ZonedDateTime.now();
         orderRecord.setAddress(orderRequest.getAddress());
-        orderRecord.setCustomer(user);
         orderRecord.setNote(orderRequest.getNote());
         orderRecord.setOrderDateTime(registerDateTime);
         orderRecord.setOrderLink(orderRequest.getOrderLink());
@@ -97,24 +95,25 @@ public class OrderController {
         orderRecord.setUsdPrice(orderRequest.getUsdPrice());
         orderRecord.setRate(orderRequest.getRate());
         orderRecord.setTax(orderRequest.getTax());
-        float totalValueUsd = orderRequest.getUsdPrice() * (1 + orderRequest.getTax()/100);
+        float totalValueUsd = orderRequest.getUsdPrice() * (1 + orderRequest.getTax() / 100);
         orderRecord.setTotalValueUsd(totalValueUsd);
         orderRecord.setTotalValueVnd(totalValueUsd * orderRequest.getRate());
 
         orderRecord.setTrackingLink(orderRequest.getTrackingLink());
-        String trackLink  = orderRequest.getTrackingLink();
-        if (!StringUtils.isEmpty(trackLink)){
-          String param = trackLink.split("\\?")[1];
-          Map<String,String> paramMap  = new HashMap<>();
-          String [] params = param.split("&");
-          for (int i = 0 ; i < params.length; i++){
-            String p = params[i].split("=")[0];
-            String v = params[i].split("=")[1];
-            paramMap.put(p,v);
-          }
-          orderRecord.setOrderId(paramMap.get("orderId"));
-        }else{
-          orderRecord.setOrderId("");
+        String trackLink = orderRequest.getTrackingLink();
+        if (!StringUtils.isEmpty(trackLink)) {
+            trackLink = trackLink.replaceAll("amp;","");
+            String param = trackLink.split("\\?")[1];
+            Map<String, String> paramMap = new HashMap<>();
+            String[] params = param.split("&");
+            for (int i = 0; i < params.length; i++) {
+                String p = params[i].split("=")[0];
+                String v = params[i].split("=")[1];
+                paramMap.put(p, v);
+            }
+            orderRecord.setOrderId(paramMap.get("orderId"));
+        } else {
+            orderRecord.setOrderId("");
         }
 
         orderRepository.save(orderRecord);
@@ -124,15 +123,17 @@ public class OrderController {
     public ResponseEntity createOrder(Model model, @RequestBody OrderRequest orderRequest,
                                       @RequestHeader("Authorization") String authorization) {
         try {
-            if (StringUtils.isEmpty(orderRequest.getTrackingLink())
-                || StringUtils.isEmpty(orderRequest.getOrderLink())
-                || orderRequest.getUsdPrice() <= 0) {
+            if (orderRequest.getUsdPrice() <= 0) {
                 return badRequest().body("Vui lòng nhập đầy đủ trường");
             }
             OrderRecord orderRecord = new OrderRecord();
             OrderStatus orderStatus = statusRepository.findById(Constant.NEW).get();
             orderRecord.setStatus(orderStatus);
-            addOrder(orderRequest,new OrderRecord(), authorization);
+            String userName = jwtTokenProvider.getUsername(authorization.substring(7));
+            User user = userRepository.findUserByUsername(userName);
+            orderRecord.setCustomer(user);
+            addOrder(orderRequest, orderRecord, authorization);
+
             return ok().build();
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -149,7 +150,7 @@ public class OrderController {
             User user = userRepository.findUserByUsername(userName);
 
             OrderRecord orderRecord = orderRepository.findById(assignOrderRequest.getOrderId()).get();
-            LocalDateTime assignDateTime = LocalDateTime.now();
+            ZonedDateTime assignDateTime = ZonedDateTime.now();
             User staff = userRepository.findById(assignOrderRequest.getStaffId()).get();
             User manager = userRepository.findById(user.getId()).get();
             orderRecord.setId(assignOrderRequest.getOrderId());
@@ -172,7 +173,7 @@ public class OrderController {
             int orderId = completeOrderRequest.getOrderId();
             OrderRecord orderRecord = orderRepository.findById(orderId).get();
             orderRecord.setId(orderId);
-            orderRecord.setCompletedDateTime(LocalDateTime.now());
+            orderRecord.setCompletedDateTime(ZonedDateTime.now());
 //            OrderStatus orderStatus = statusRepository.findById(Constant.COMPLETE).get();
 //            orderRecord.setStatus(orderStatus);
             orderRepository.save(orderRecord);
@@ -188,7 +189,7 @@ public class OrderController {
         try {
             int orderId = completeOrderRequest.getOrderId();
             OrderRecord orderRecord = orderRepository.findById(orderId).get();
-            orderRecord.setPicDateTime(LocalDateTime.now());
+            orderRecord.setPicDateTime(ZonedDateTime.now());
             OrderStatus orderStatus = statusRepository.findById(Constant.IN_PROGRESS).get();
             orderRecord.setStatus(orderStatus);
             orderRepository.save(orderRecord);
@@ -214,7 +215,7 @@ public class OrderController {
             }
             model.addAttribute("order", orderRecord);
             model.addAttribute("role", user.getRole().getName());
-            model.addAttribute("statuses",orderStatuses);
+            model.addAttribute("statuses", orderStatuses);
             return ok(model);
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -245,7 +246,7 @@ public class OrderController {
                     staffs.add(staff);
                 }
             });
-            model.addAttribute("staff",staffs);
+            model.addAttribute("staff", staffs);
             return ok(model);
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -278,7 +279,7 @@ public class OrderController {
             });
             List<User> customers = new ArrayList<>();
             userRepository.findAll().forEach(staff -> {
-                    customers.add(staff);
+                customers.add(staff);
             });
             List<OrderRecord> listOrder = new ArrayList<>();
             if (user.getRole().getName().equals(Constant.ADMIN)) {
@@ -304,6 +305,7 @@ public class OrderController {
             return ok(model);
         }
     }
+
     @RequestMapping(value = "/getListByDate", method = RequestMethod.GET)
     public ResponseEntity getListOrder(Model model,
                                        @RequestParam String startDateStr, @RequestParam String endDateStr,
@@ -322,21 +324,21 @@ public class OrderController {
                 customers.add(staff);
             });
             List<OrderRecord> listOrder = new ArrayList<>();
-            if (startDateStr.compareTo("none") != 0){
+            if (startDateStr.compareTo("none") != 0) {
                 if (user.getRole().getName().equals(Constant.ADMIN)) {
                     List<OrderRecord> finalListOrder = listOrder;
                     orderRepository.findAll().forEach(order -> finalListOrder.add(order));
                 } else if (user.getRole().getName().equals(Constant.CUSTOMER)) {
                     List<OrderRecord> finalListOrder = listOrder;
                     orderRepository.findAll().forEach(order -> {
-                        if (order.getCustomer().getId() == user.getId()){
+                        if (order.getCustomer().getId() == user.getId()) {
                             finalListOrder.add(order);
                         }
                     });
                 } else if (user.getRole().getName().equals(Constant.STAFF)) {
                     List<OrderRecord> finalListOrder = listOrder;
                     orderRepository.findAll().forEach(order -> {
-                        if (order.getPersonInCharge().getId() == user.getId()){
+                        if (order.getPersonInCharge().getId() == user.getId()) {
                             finalListOrder.add(order);
                         }
                     });
@@ -344,12 +346,10 @@ public class OrderController {
                 Date startDate = new SimpleDateFormat("MM/dd/yyyy").parse(startDateStr);
                 Date endDate = new SimpleDateFormat("MM/dd/yyyy").parse(endDateStr);
 
-                LocalDateTime startDateTime = LocalDate.from(startDate.toInstant().atZone(ZoneId.systemDefault())
-                        .toLocalDate()).atStartOfDay();
-                LocalDateTime endDateTime = LocalDate.from(endDate.toInstant().atZone(ZoneId.systemDefault())
-                        .toLocalDate().plusDays(1)).atStartOfDay();
-                listOrder = listOrder.stream().filter( orderRecord -> {
-                    LocalDateTime orderDateTime = orderRecord.getOrderDateTime();
+                ZonedDateTime startDateTime = ZonedDateTime.from(startDate.toInstant().atZone(ZoneId.systemDefault())).truncatedTo(ChronoUnit.DAYS);
+                ZonedDateTime endDateTime = ZonedDateTime.from(endDate.toInstant().atZone(ZoneId.systemDefault())).plusDays(1).truncatedTo(ChronoUnit.DAYS);
+                listOrder = listOrder.stream().filter(orderRecord -> {
+                    ZonedDateTime orderDateTime = orderRecord.getOrderDateTime();
                     return orderDateTime.isBefore(endDateTime) && orderDateTime.isAfter(startDateTime);
                 }).collect(Collectors.toList());
 

@@ -18,6 +18,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -48,10 +50,10 @@ public class ReportController {
             Date startDate = new SimpleDateFormat("MM/dd/yyyy").parse(startDateStr);
             Date endDate = new SimpleDateFormat("MM/dd/yyyy").parse(endDateStr);
 
-            LocalDateTime startDateTime = LocalDate.from(startDate.toInstant().atZone(ZoneId.systemDefault())
-                    .toLocalDate()).atStartOfDay();
-            LocalDateTime endDateTime = LocalDate.from(endDate.toInstant().atZone(ZoneId.systemDefault())
-                    .toLocalDate().plusDays(1)).atStartOfDay();
+            ZonedDateTime startDateTime = ZonedDateTime.from(startDate.toInstant().atZone(ZoneId.systemDefault()))
+                    .truncatedTo(ChronoUnit.DAYS);
+            ZonedDateTime endDateTime = ZonedDateTime.from(endDate.toInstant().atZone(ZoneId.systemDefault()))
+                    .plusDays(1).truncatedTo(ChronoUnit.DAYS);
             List<Optional<OrderRecord>> optionals = orderRepository.findListByDate(startDateTime, endDateTime);
              List<OrderRecord> orderRecords = optionals.stream().map(Optional::get).collect(Collectors.toList());
             List<Transaction> transactions = transactionRepository.findListByDate(startDateTime,endDateTime)
@@ -139,7 +141,7 @@ public class ReportController {
             Transaction transaction =  new Transaction();
             transaction.setCustomer(userRepository.findById(userId).get());
             transaction.setPayAmountVnd((float)paymentAmount);
-            transaction.setPayDateTime(LocalDateTime.now());
+            transaction.setPayDateTime(ZonedDateTime.now());
             transactionRepository.save(transaction);
         }catch (Exception e){
             e.printStackTrace();

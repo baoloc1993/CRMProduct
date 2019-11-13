@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -61,8 +63,7 @@ public class DataController {
     try {
       Date date = simpleDateFormat.parse(migrateRequest.getDate());
 
-      LocalDateTime registerDateTime = LocalDate.from(date.toInstant().atZone(ZoneId.systemDefault())
-          .toLocalDate()).atStartOfDay();
+      ZonedDateTime registerDateTime = ZonedDateTime.from(date.toInstant().atZone(ZoneId.systemDefault())).truncatedTo(ChronoUnit.DAYS);
       int userId = migrateRequest.getUserId();
       String data = migrateRequest.getData();
       ArrayList<OrderRecord> orderRecords = new ArrayList<>();
